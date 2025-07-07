@@ -1,17 +1,20 @@
 #!/bin/bash
 
 # Helper: Display popup
-# $1 = Message, $2 = command to run
+# $1 = Message, $2 = command to run, $3 = Button text (optional)
 popup() {
+  BUTTON_TEXT=${3:-"Next"}
   osascript -e '
     on run argv
       set dialogText to item 1 of argv
       set launchCommand to item 2 of argv
+      set buttonText to item 3 of argv
       do shell script launchCommand
-      display dialog dialogText buttons {"Next"} default button "Next" with title "Manual Step Required"
+      display dialog dialogText buttons {buttonText} default button buttonText with title "Manual Step Required"
     end run
-  ' "$1" "$2"
+  ' "$1" "$2" "$BUTTON_TEXT"
 }
+
 
 # Kill running processes to apply changes
 killall "System Settings" 2>/dev/null
@@ -99,8 +102,8 @@ defaults write com.apple.finder ShowStatusBar -bool true
 # Reveal hidden files (toggle CMD+Shift+.)
 defaults write com.apple.finder AppleShowAllFiles -bool true
 # Sidebar items – manual setup
-popup "Add sidebar items (Applications, Downloads, Javin, iCloud Drive, External disks)." \
-"osascript -e \"tell application \\\"Finder\\\" to activate\" -e \"tell application \\\"System Events\\\" to tell process \\\"Finder\\\" to click menu item \\\"Settings…\\\" of menu \\\"Finder\\\" of menu bar 1\""
+popup "Add sidebar items (Applications, Downloads, User, iCloud Drive, External disks)." \
+"osascript -e \"tell application \\\"Finder\\\" to activate\" -e \"tell application \\\"System Events\\\" to tell process \\\"Finder\\\" to click menu item \\\"Settings…\\\" of menu \\\"Finder\\\" of menu bar 1\"" "Finish"
 
 # Done
 echo "✅ macOS configuration script complete. Some settings must still be done manually."
