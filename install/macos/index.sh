@@ -19,18 +19,19 @@ popup() {
 # Kill running processes to apply changes
 killall "System Settings" 2>/dev/null
 killall "Finder"
+killall "Dock"
 
 # Reference: https://gist.github.com/rmcdongit/f66ff91e0dad78d4d6346a75ded4b751
 
 # --- iCloud ---
 popup "Change your profile picture to the previous iCloud one." "open "x-apple.systempreferences:com.apple.preferences.AppleIDPrefPane""
-popup "Enable Touch ID for Media & Purchases." "open "x-apple.systempreferences:com.apple.preferences.AppleIDPrefPane?com.apple.AppleMediaServicesUI.SpyglassPurchases""
+popup "Enable 'Touch ID for 'Purchases'." "open "x-apple.systempreferences:com.apple.preferences.AppleIDPrefPane?com.apple.AppleMediaServicesUI.SpyglassPurchases""
 
 # --- Sound ---
-popup "Set Alert Sound to Pluck." "open "x-apple.systempreferences:com.apple.Sound-Settings.extension""
+popup "Set 'Alert Sound' to 'Pluck'." "open "x-apple.systempreferences:com.apple.Sound-Settings.extension""
 # Play sound on startup = Off
-popup "Insert password in your terminal after pressing Next." ""
-sudo nvram StartupMute=%01
+popup "MacOS will now ask for your password to disable the startup sound." ""
+osascript -e 'do shell script "nvram StartupMute=%01" with administrator privileges'
 
 # --- Appearance ---
 # Sidebar icon size = Medium
@@ -44,7 +45,7 @@ defaults write com.apple.controlcenter "NSStatusItem Visible Sound" -bool true
 # Battery = Off
 defaults write com.apple.controlcenter "NSStatusItem Visible Battery" -bool false
 # Spotlight = Don’t Show in Menu Bar
-popup "Scroll down to Menu Bar Only, for Spotlight select Don't show in Menu bar." "open "x-apple.systempreferences:com.apple.ControlCenter-Settings.extension?""
+popup "Scroll down to 'Menu Bar Only', for Spotlight select 'Don't show in Menu Bar'." "open "x-apple.systempreferences:com.apple.ControlCenter-Settings.extension""
 
 # --- Desktop & Dock ---
 # Size = 20% small
@@ -59,14 +60,15 @@ defaults write com.apple.dock autohide -bool true
 defaults write com.apple.dock launchanim -bool false
 # Show recent apps in Dock = Off
 defaults write com.apple.dock show-recents -bool false
-# Stage Manager settings require manual adjustment
-popup "- For 'Desktop & Stage Manager' untick all 'Show Items'\n- Set 'Click wallpaper to reveal desktop' to 'Only in Stage Manager'." "open "x-apple.systempreferences:com.apple.Desktop-Settings.extension?Dock""
+# Stage Manager settings
+popup "• For 'Desktop & Stage Manager' untick all 'Show Items'.
+• Set 'Click wallpaper to reveal desktop' to 'Only in Stage Manager'." \
+"open "x-apple.systempreferences:com.apple.Desktop-Settings.extension?Dock""
 # Hot Corners = Off
 defaults write com.apple.dock wvous-tl-corner -int 0
 defaults write com.apple.dock wvous-tr-corner -int 0
 defaults write com.apple.dock wvous-bl-corner -int 0
 defaults write com.apple.dock wvous-br-corner -int 0
-killall Dock
 
 # --- Displays ---
 popup "Set display scaling to 'More Space'." "open "x-apple.systempreferences:com.apple.Displays-Settings.extension""
@@ -104,6 +106,11 @@ defaults write com.apple.finder AppleShowAllFiles -bool true
 # Sidebar items – manual setup
 popup "Add sidebar items (Applications, Downloads, User, iCloud Drive, External disks)." \
 "osascript -e \"tell application \\\"Finder\\\" to activate\" -e \"tell application \\\"System Events\\\" to tell process \\\"Finder\\\" to click menu item \\\"Settings…\\\" of menu \\\"Finder\\\" of menu bar 1\"" "Finish"
+
+# Kill running processes to apply changes
+killall "System Settings" 2>/dev/null
+killall "Finder"
+killall "Dock"
 
 # Done
 echo "✅ macOS configuration script complete. Some settings must still be done manually."
