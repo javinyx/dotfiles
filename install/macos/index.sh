@@ -1,22 +1,31 @@
 #!/bin/bash
 
-# Helper: Display popup
+STEP=0
+TOTAL_STEPS=10
+
+# Display Popup
 # $1 = Message, $2 = Command to run, $3 = Button text (optional)
 popup() {
-  BUTTON_TEXT=${3:-"Next"}
+  STEP=$((STEP + 1))
+  local message="$1"
+  local command="$2"
+  local button_text="${3:-Next}"
+  local title="Manual Setup $STEP/$TOTAL_STEPS"
+
   osascript -e '
     on run argv
       set dialogText to item 1 of argv
       set launchCommand to item 2 of argv
       set buttonText to item 3 of argv
+      set dialogTitle to item 4 of argv
       do shell script launchCommand
-      set dialogResult to display dialog dialogText buttons {"Quit", buttonText} default button buttonText with title "Manual Step Required"
+      set dialogResult to display dialog dialogText buttons {"Quit", buttonText} default button buttonText with title dialogTitle
       set theButton to button returned of dialogResult
       if theButton is "Quit" then
         error number -128
       end if
     end run
-  ' "$1" "$2" "$BUTTON_TEXT" || exit 1
+  ' "$message" "$command" "$button_text" "$title" || exit 1
 }
 
 # Kill running processes to apply changes
