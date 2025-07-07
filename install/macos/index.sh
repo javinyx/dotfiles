@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Helper: Display GUI reminder popup with Open and Done buttons
-# $1 = Message, $2 = command to run (e.g. 'open -b com.apple.systempreferences /System/Library/PreferencePanes/XYZ.prefPane')
-guireminder() {
+# Helper: Display popup with Open and Done buttons
+# $1 = Message, $2 = command to run
+popup() {
   osascript -e '
     on run argv
       set dialogText to item 1 of argv
@@ -33,13 +33,13 @@ killall "Finder"
 # Reference: https://gist.github.com/rmcdongit/f66ff91e0dad78d4d6346a75ded4b751
 
 # --- iCloud ---
-guireminder "Change your profile picture to the previous iCloud one." "open "x-apple.systempreferences:com.apple.preferences.AppleIDPrefPane""
-guireminder "Enable Touch ID for Media & Purchases." "open "x-apple.systempreferences:com.apple.preferences.AppleIDPrefPane?com.apple.AppleMediaServicesUI.SpyglassPurchases""
+popup "Change your profile picture to the previous iCloud one." "open "x-apple.systempreferences:com.apple.preferences.AppleIDPrefPane""
+popup "Enable Touch ID for Media & Purchases." "open "x-apple.systempreferences:com.apple.preferences.AppleIDPrefPane?com.apple.AppleMediaServicesUI.SpyglassPurchases""
 
 # --- Sound ---
-guireminder "Set Alert Sound to Pluck." "open "x-apple.systempreferences:com.apple.Sound-Settings.extension""
+popup "Set Alert Sound to Pluck." "open "x-apple.systempreferences:com.apple.Sound-Settings.extension""
 # Play sound on startup = Off
-guireminder "Insert password in your terminal after pressing Done." ""
+popup "Insert password in your terminal after pressing Done." ""
 sudo nvram StartupMute=%01
 
 # --- Appearance ---
@@ -54,7 +54,7 @@ defaults write com.apple.controlcenter "NSStatusItem Visible Sound" -bool true
 # Battery = Off
 defaults write com.apple.controlcenter "NSStatusItem Visible Battery" -bool false
 # Spotlight = Don’t Show in Menu Bar
-guireminder "Scroll down to Menu Bar Only, for Spotlight select Don't show in Menu bar." "open "x-apple.systempreferences:com.apple.ControlCenter-Settings.extension?""
+popup "Scroll down to Menu Bar Only, for Spotlight select Don't show in Menu bar." "open "x-apple.systempreferences:com.apple.ControlCenter-Settings.extension?""
 
 # --- Desktop & Dock ---
 # Size = 20% small
@@ -70,8 +70,8 @@ defaults write com.apple.dock launchanim -bool false
 # Show recent apps in Dock = Off
 defaults write com.apple.dock show-recents -bool false
 # Stage Manager settings require manual adjustment
-guireminder "For Desktop & Stage Manager untick all Show Items." "open "x-apple.systempreferences:com.apple.Desktop-Settings.extension?Dock""
-guireminder "Set 'Click wallpaper to reveal desktop' to 'Only in Stage Manager'." "open "x-apple.systempreferences:com.apple.Desktop-Settings.extension?Dock""
+popup "For Desktop & Stage Manager untick all Show Items." "open "x-apple.systempreferences:com.apple.Desktop-Settings.extension?Dock""
+popup "Set 'Click wallpaper to reveal desktop' to 'Only in Stage Manager'." "open "x-apple.systempreferences:com.apple.Desktop-Settings.extension?Dock""
 # Hot Corners = Off
 defaults write com.apple.dock wvous-tl-corner -int 0
 defaults write com.apple.dock wvous-tr-corner -int 0
@@ -80,18 +80,18 @@ defaults write com.apple.dock wvous-br-corner -int 0
 killall Dock
 
 # --- Displays ---
-guireminder "Set display scaling to 'More Space'." "open "x-apple.systempreferences:com.apple.Displays-Settings.extension""
+popup "Set display scaling to 'More Space'." "open "x-apple.systempreferences:com.apple.Displays-Settings.extension""
 
 # --- Touch ID & Password ---
-guireminder "Enable Apple Watch unlock." "open "x-apple.systempreferences:com.apple.Touch-ID-Settings.extension?""
+popup "Enable Apple Watch unlock." "open "x-apple.systempreferences:com.apple.Touch-ID-Settings.extension?""
 
 # --- Game Center ---
-# guireminder "Open Game Center app and accept the login prompt." "open -a \"Game Center\""
+# popup "Open Game Center app and accept the login prompt." "open -a \"Game Center\""
 
 # --- Keyboard ---
 # Correct spelling automatically = Off
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
-guireminder "Edit input sources." "open "x-apple.systempreferences:com.apple.Keyboard-Settings.extension""
+popup "Edit input sources." "open "x-apple.systempreferences:com.apple.Keyboard-Settings.extension""
 
 # --- Finder ---
 # Show nothing on desktop
@@ -113,7 +113,7 @@ defaults write com.apple.finder ShowStatusBar -bool true
 # Reveal hidden files (toggle CMD+Shift+.)
 defaults write com.apple.finder AppleShowAllFiles -bool true
 # Sidebar items – manual setup
-guireminder "Add sidebar items (Applications, Downloads, Javin, iCloud Drive, External disks) (Finder > Settings > Sidebar)." \
+popup "Add sidebar items (Applications, Downloads, Javin, iCloud Drive, External disks)." \
 "osascript -e \"tell application \\\"Finder\\\" to activate\" -e \"tell application \\\"System Events\\\" to tell process \\\"Finder\\\" to click menu item \\\"Settings…\\\" of menu \\\"Finder\\\" of menu bar 1\""
 
 # Done

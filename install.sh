@@ -15,7 +15,8 @@ os_name=$(uname)
 echo "Detected OS: $os_name"
 
 if [[ "$os_name" == "Darwin" ]]; then
-    echo "Installing dependencies for MacOS..."
+    echo "Running MacOS scripts..."
+    source ./install/macos/index.sh
 else
     echo "Unsupported OS. Only MacOS (Darwin) is supported for now."
     exit 1
