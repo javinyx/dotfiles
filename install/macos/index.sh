@@ -1,27 +1,14 @@
 #!/bin/bash
 
-# Helper: Display popup with Open and Done buttons
+# Helper: Display popup
 # $1 = Message, $2 = command to run
 popup() {
   osascript -e '
     on run argv
       set dialogText to item 1 of argv
       set launchCommand to item 2 of argv
-      set openClicked to false
-      repeat
-        if openClicked then
-          set dialogResult to display dialog dialogText buttons {"Done", "Open"} default button "Open" with title "Manual Step Required"
-        else
-          set dialogResult to display dialog dialogText buttons {"Done", "Open"} default button "Open" with title "Manual Step Required"
-        end if
-        set theButton to button returned of dialogResult
-        if theButton is "Open" then
-          do shell script launchCommand
-          set openClicked to true
-        else if theButton is "Done" and openClicked then
-          exit repeat
-        end if
-      end repeat
+      do shell script launchCommand
+      display dialog dialogText buttons {"Next"} default button "Next" with title "Manual Step Required"
     end run
   ' "$1" "$2"
 }
@@ -39,7 +26,7 @@ popup "Enable Touch ID for Media & Purchases." "open "x-apple.systempreferences:
 # --- Sound ---
 popup "Set Alert Sound to Pluck." "open "x-apple.systempreferences:com.apple.Sound-Settings.extension""
 # Play sound on startup = Off
-popup "Insert password in your terminal after pressing Done." ""
+popup "Insert password in your terminal after pressing Next." ""
 sudo nvram StartupMute=%01
 
 # --- Appearance ---
@@ -70,8 +57,7 @@ defaults write com.apple.dock launchanim -bool false
 # Show recent apps in Dock = Off
 defaults write com.apple.dock show-recents -bool false
 # Stage Manager settings require manual adjustment
-popup "For Desktop & Stage Manager untick all Show Items." "open "x-apple.systempreferences:com.apple.Desktop-Settings.extension?Dock""
-popup "Set 'Click wallpaper to reveal desktop' to 'Only in Stage Manager'." "open "x-apple.systempreferences:com.apple.Desktop-Settings.extension?Dock""
+popup "- For 'Desktop & Stage Manager' untick all 'Show Items'\n- Set 'Click wallpaper to reveal desktop' to 'Only in Stage Manager'." "open "x-apple.systempreferences:com.apple.Desktop-Settings.extension?Dock""
 # Hot Corners = Off
 defaults write com.apple.dock wvous-tl-corner -int 0
 defaults write com.apple.dock wvous-tr-corner -int 0
