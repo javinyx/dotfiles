@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Helper: Display popup
-# $1 = Message, $2 = command to run, $3 = Button text (optional)
+# $1 = Message, $2 = Command to run, $3 = Button text (optional)
 popup() {
   BUTTON_TEXT=${3:-"Next"}
   osascript -e '
@@ -10,11 +10,14 @@ popup() {
       set launchCommand to item 2 of argv
       set buttonText to item 3 of argv
       do shell script launchCommand
-      display dialog dialogText buttons {buttonText} default button buttonText with title "Manual Step Required"
+      set dialogResult to display dialog dialogText buttons {"Quit", buttonText} default button buttonText with title "Manual Step Required"
+      set theButton to button returned of dialogResult
+      if theButton is "Quit" then
+        error number -128
+      end if
     end run
-  ' "$1" "$2" "$BUTTON_TEXT"
+  ' "$1" "$2" "$BUTTON_TEXT" || exit 1
 }
-
 
 # Kill running processes to apply changes
 killall "System Settings" 2>/dev/null
