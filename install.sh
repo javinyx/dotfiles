@@ -17,7 +17,7 @@ echo "Detected OS: $os_name"
 if [[ "$os_name" == "Darwin" ]]; then
     echo "Running MacOS scripts..."
     source ./install/macos/settings.sh
-    source ./install/macos/homebrew.sh
+    source ./install/macos/packages.sh
 else
     echo "Unsupported OS. Only MacOS (Darwin) is supported for now."
     exit 1
