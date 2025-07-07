@@ -125,4 +125,4 @@ killall "Finder"
 killall "Dock"
 
 # Done
-echo "✅ macOS configuration script complete. Some settings must still be done manually."
+echo "✅ MacOS settings configuration script complete. Restart to apply all changes."
