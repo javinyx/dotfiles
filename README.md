@@ -9,13 +9,17 @@
                            |___/
 ```
 
-Javin's dotfiles, managed with [`chezmoi`](https://github.com/twpayne/chezmoi).
+Welcome to my dotfiles repository, they are currently for MacOS only.
 
-Install them with:
+## Installation
 
 ```shell
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/javinyx/dotfiles/refs/heads/main/install.sh)"
 chezmoi init javinyx
 ```
 
-Personal secrets are stored in [1Password](https://1password.com) and you'll
-need the [1Password CLI](https://developer.1password.com/docs/cli/) installed.
+## Tools
+
+- chezmoi
+- 1password
+- mise
