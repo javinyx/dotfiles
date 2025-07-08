@@ -3,8 +3,8 @@
 # Homebrew
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 eval "$(/opt/homebrew/bin/brew shellenv)"
-
-brew bundle --file=$BREWFILE_PATH
+brew analytics off
+brew bundle
 
 # Chezmoi
 chezmoi init javinyx

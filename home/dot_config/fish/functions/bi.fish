@@ -3,6 +3,6 @@ function bi
 
   if [ $status -eq 0 ]
     echo "✔️  Successfully installed $argv[1]"
-    brew bundle dump --file=$BREWFILE_PATH --force --no-vscode
+    brew bundle dump --force --no-vscode
   end
 end

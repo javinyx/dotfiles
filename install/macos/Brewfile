@@ -1,7 +1,7 @@
 brew "chezmoi"
 brew "fish"
-brew "git"
 brew "mas"
+brew "mise"
 cask "1password"
 cask "1password-cli"
 cask "font-monocraft-nerd-font"
