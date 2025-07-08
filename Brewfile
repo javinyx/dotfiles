@@ -1,0 +1,14 @@
+brew "chezmoi"
+brew "fish"
+brew "mas"
+cask "1password"
+cask "1password-cli"
+cask "font-monocraft-nerd-font"
+cask "font-space-mono-nerd-font"
+cask "ghostty"
+cask "google-chrome"
+cask "raycast"
+cask "spotify"
+cask "visual-studio-code"
+mas "Craft", id: 1487937127
+mas "Keynote", id: 409183694
