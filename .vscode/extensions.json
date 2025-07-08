@@ -1,6 +1,7 @@
 {
     "recommendations": [
         "bmalehorn.vscode-fish",
-        "tamasfe.even-better-toml"
+        "tamasfe.even-better-toml",
+        "hverlin.mise-vscode"
     ]
 }
