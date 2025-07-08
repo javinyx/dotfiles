@@ -12,3 +12,7 @@ chezmoi init javinyx
 # Fish
 echo /opt/homebrew/bin/fish | sudo tee -a /etc/shells
 chsh -s /opt/homebrew/bin/fish
+
+# Mise
+mise use -g bun
+mise use -g node
