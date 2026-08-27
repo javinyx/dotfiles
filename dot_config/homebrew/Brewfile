@@ -1,0 +1,11 @@
+brew "chezmoi"
+brew "fish"
+brew "mise"
+brew "mole"
+
+cask "1password"
+cask "1password-cli"
+cask "font-monocraft-nerd-font"
+cask "ghostty"
+cask "orbstack"
+cask "visual-studio-code"

@@ -1,0 +1,39 @@
+{{- if and (eq .chezmoi.os "darwin") .applyMacOSDefaults -}}
+#!/bin/sh
+set -eu
+
+# Keyboard and text input
+defaults write -g NSAutomaticSpellingCorrectionEnabled -bool false
+defaults write -g NSAutomaticCapitalizationEnabled -bool false
+defaults write -g NSAutomaticInlinePredictionEnabled -bool false
+defaults write -g NSAutomaticPeriodSubstitutionEnabled -bool false
+defaults write -g NSAutomaticQuoteSubstitutionEnabled -bool false
+defaults write -g NSAutomaticDashSubstitutionEnabled -bool false
+defaults write com.apple.TextInputMenu visible -bool false
+defaults write com.apple.controlcenter "NSStatusItem Visible InputMenu" -bool false
+
+# Desktop and widgets
+defaults write com.apple.WindowManager StandardHideWidgets -int 1
+defaults write com.apple.WindowManager StageManagerHideWidgets -int 1
+defaults write com.apple.WindowManager AllowLocalClientToDropRemoteWidgets -bool false
+defaults write com.apple.WindowManager EnableStandardClickToShowDesktop -bool false
+
+# Dock
+defaults write com.apple.dock persistent-apps -array
+defaults write com.apple.dock persistent-others -array
+defaults write com.apple.dock show-recents -bool false
+defaults write com.apple.dock autohide -bool true
+defaults write com.apple.dock autohide-delay -float 0
+defaults write com.apple.dock autohide-time-modifier -float 0.2
+
+# Control Center and Spotlight
+defaults -currentHost write com.apple.Spotlight MenuItemHidden -int 1
+defaults -currentHost write com.apple.Spotlight PasteboardHistoryEnabled -bool true
+defaults -currentHost write com.apple.controlcenter BatteryShowPercentage -bool true
+
+killall cfprefsd 2>/dev/null || true
+killall ControlCenter 2>/dev/null || true
+killall SystemUIServer 2>/dev/null || true
+killall WindowManager 2>/dev/null || true
+killall Dock 2>/dev/null || true
+{{- end -}}

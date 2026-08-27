@@ -1,0 +1,21 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/bin/sh
+set -eu
+
+if [ -x /opt/homebrew/bin/fish ]; then
+    fish_path=/opt/homebrew/bin/fish
+elif [ -x /usr/local/bin/fish ]; then
+    fish_path=/usr/local/bin/fish
+else
+    echo "Fish is not installed" >&2
+    exit 1
+fi
+
+if ! grep -Fxq "$fish_path" /etc/shells; then
+    echo "$fish_path" | sudo tee -a /etc/shells >/dev/null
+fi
+
+if [ "${SHELL:-}" != "$fish_path" ]; then
+    chsh -s "$fish_path"
+fi
+{{- end -}}

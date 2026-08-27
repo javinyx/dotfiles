@@ -1,0 +1,16 @@
+{{- if and (eq .chezmoi.os "darwin") .clearTextReplacements -}}
+#!/bin/sh
+set -eu
+
+db="$HOME/Library/KeyboardServices/TextReplacements.db"
+if [ -f "$db" ]; then
+    sqlite3 "$db" 'UPDATE ZTEXTREPLACEMENTENTRY SET ZWASDELETED = 1, ZNEEDSSAVETOCLOUD = 1;' 2>/dev/null || true
+    sqlite3 "$db" 'DELETE FROM ZTEXTREPLACEMENTENTRY;' 2>/dev/null || true
+fi
+
+defaults delete -g NSUserDictionaryReplacementItems 2>/dev/null || true
+rm -f "$HOME/Library/Keyboard/textReplacements.cache"
+killall keyboardservicesd 2>/dev/null || true
+killall kbd 2>/dev/null || true
+killall cfprefsd 2>/dev/null || true
+{{- end -}}

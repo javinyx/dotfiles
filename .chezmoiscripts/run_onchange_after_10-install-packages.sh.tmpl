@@ -1,0 +1,18 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/bin/sh
+set -eu
+
+# Brewfile checksum: {{ include "dot_config/homebrew/Brewfile" | sha256sum }}
+
+if [ -x /opt/homebrew/bin/brew ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [ -x /usr/local/bin/brew ]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+else
+    echo "Homebrew is unavailable after bootstrap" >&2
+    exit 1
+fi
+
+brew analytics off
+brew bundle --file "$HOME/.config/homebrew/Brewfile"
+{{- end -}}

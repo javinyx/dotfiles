@@ -1,25 +1,38 @@
 # dotfiles
 
-```text
-   __              _
-   \ \  __ ___   _(_)_ __  _   ___  __
-    \ \/ _` \ \ / / | '_ \| | | \ \/ /
- /\_/ / (_| |\ V /| | | | | |_| |>  <
- \___/ \__,_| \_/ |_|_| |_|\__, /_/\_\
-                           |___/
+Personal macOS dotfiles managed with [chezmoi](https://www.chezmoi.io/).
+
+## Install
+
+```sh
+chezmoi init --apply javinyx
 ```
 
-Welcome to my dotfiles repository, they are currently for MacOS only.
+During initialization, chezmoi asks which one-time macOS setup actions to run.
+Destructive cleanup actions default to disabled.
 
-## Installation
+Homebrew packages are declared in `~/.config/homebrew/Brewfile`. Chezmoi
+installs Homebrew when necessary and runs `brew bundle` whenever that file
+changes.
 
-```shell
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/javinyx/dotfiles/refs/heads/main/install.sh)"
-chezmoi init javinyx
+## Daily use
+
+```sh
+chezmoi diff
+chezmoi apply
+chezmoi update
 ```
 
-## Tools
+Private values are retrieved from 1Password and are never committed to this
+public repository.
 
-- chezmoi
-- 1password
-- mise
+Use `github-personal` and `github-work` as SSH host aliases when cloning. Git
+automatically rewrites GitHub remotes to the matching alias for repositories
+inside `~/Projects/Personal` and `~/Projects/Work`.
+
+Ghostty uses Monocraft Nerd Font, the built-in Banana Blueberry theme, and a
+pinned cursor shader. Remove or comment the `custom-shader` line if the shader
+causes rendering problems.
+
+Mise provides the global Node.js 24, Temurin JDK 25, and latest Python 3
+runtimes. Project-level `mise.toml` files can override these defaults.

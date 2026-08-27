@@ -1,0 +1,41 @@
+[user]
+    name = Javin Barone
+
+[init]
+    defaultBranch = main
+
+[core]
+    editor = code --wait
+
+[push]
+    autoSetupRemote = true
+
+[pull]
+    ff = only
+
+[fetch]
+    prune = true
+
+[diff]
+    algorithm = histogram
+
+[merge]
+    conflictStyle = zdiff3
+
+[gpg]
+    format = ssh
+
+[gpg "ssh"]
+    program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+
+[commit]
+    gpgSign = true
+
+[tag]
+    gpgSign = true
+
+[includeIf "gitdir:~/Projects/Work/"]
+    path = ~/.config/git/work.inc
+
+[includeIf "gitdir:~/Projects/Personal/"]
+    path = ~/.config/git/personal.inc

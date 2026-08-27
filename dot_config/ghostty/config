@@ -1,0 +1,16 @@
+font-family = Monocraft
+font-size = 15
+
+theme = Banana Blueberry
+background-opacity = 0.98
+
+window-padding-x = 12
+window-padding-y = 12
+window-padding-balance = true
+macos-titlebar-style = transparent
+
+cursor-style = block
+cursor-style-blink = false
+
+custom-shader = shaders/cursor_blaze.glsl
+custom-shader-animation = true

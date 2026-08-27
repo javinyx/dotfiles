@@ -1,0 +1,11 @@
+{{- $applyMacOSDefaults := promptBoolOnce . "applyMacOSDefaults" "Apply minimal macOS defaults" true -}}
+{{- $clearTextReplacements := promptBoolOnce . "clearTextReplacements" "Clear all macOS text replacements" false -}}
+{{- $removeStockApps := promptBoolOnce . "removeStockApps" "Remove Apple's iWork and media apps" false -}}
+
+[data]
+    applyMacOSDefaults = {{ $applyMacOSDefaults }}
+    clearTextReplacements = {{ $clearTextReplacements }}
+    removeStockApps = {{ $removeStockApps }}
+
+[onepassword]
+    mode = "account"

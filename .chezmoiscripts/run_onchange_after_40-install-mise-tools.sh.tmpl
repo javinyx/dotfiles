@@ -1,0 +1,10 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/bin/sh
+set -eu
+
+# mise config checksum: {{ include "dot_config/mise/config.toml" | sha256sum }}
+
+if command -v mise >/dev/null 2>&1; then
+    mise install
+fi
+{{- end -}}

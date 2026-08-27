@@ -1,0 +1,7 @@
+[user]
+    email = {{ onepasswordRead "op://Development/Development SSH/email" | quote }}
+    signingKey = {{ onepasswordRead "op://Development/Development SSH/public key" | quote }}
+
+[url "git@github-personal:"]
+    insteadOf = git@github.com:
+    insteadOf = https://github.com/
