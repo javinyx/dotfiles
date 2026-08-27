@@ -1,12 +1,12 @@
-Host github-personal
-    HostName github.com
+Host github.com
     User git
     IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
     IdentityFile ~/.ssh/development.pub
     IdentitiesOnly yes
 
-Host github-work
-    HostName github.com
+{{ $workHostname := onepasswordRead "op://Work/Work SSH/hostname" -}}
+Host {{ $workHostname }}
+    HostName {{ $workHostname }}
     User git
     IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
     IdentityFile ~/.ssh/work.pub

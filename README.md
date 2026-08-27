@@ -26,9 +26,8 @@ chezmoi update
 Private values are retrieved from 1Password and are never committed to this
 public repository.
 
-Use `github-personal` and `github-work` as SSH host aliases when cloning. Git
-automatically rewrites GitHub remotes to the matching alias for repositories
-inside `~/Projects/Personal` and `~/Projects/Work`.
+GitHub uses the Development SSH key. The company-hosted Bitbucket instance uses
+the Work SSH key, with its private hostname retrieved from 1Password.
 
 Ghostty uses Monocraft Nerd Font, the built-in Banana Blueberry theme, and a
 pinned cursor shader. Remove or comment the `custom-shader` line if the shader
