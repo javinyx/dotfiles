@@ -2,10 +2,13 @@
 #!/bin/sh
 set -eu
 
-if command -v brew >/dev/null 2>&1; then
+# Check the install prefixes directly rather than with command -v: chezmoi's own
+# PATH is fixed when it starts and need not contain Homebrew, so an existing
+# installation would otherwise be detected as missing and reinstalled.
+if [ -x /opt/homebrew/bin/brew ] || [ -x /usr/local/bin/brew ]; then
     exit 0
 fi
 
 echo "Installing Homebrew..."
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 {{- end -}}

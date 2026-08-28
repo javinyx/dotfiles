@@ -4,7 +4,19 @@ set -eu
 
 # mise config checksum: {{ include "dot_config/mise/config.toml" | sha256sum }}
 
+# Homebrew installs mise earlier in this same apply, but chezmoi's PATH still
+# predates that, so resolve brew explicitly as the package script does. Without
+# this the guard below silently matches nothing and no runtime is installed on a
+# new machine.
+if [ -x /opt/homebrew/bin/brew ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [ -x /usr/local/bin/brew ]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+fi
+
 if command -v mise >/dev/null 2>&1; then
     mise install
+else
+    echo "mise is unavailable; skipping runtime installation" >&2
 fi
 {{- end -}}
