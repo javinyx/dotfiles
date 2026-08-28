@@ -15,7 +15,12 @@ if ! grep -Fxq "$fish_path" /etc/shells; then
     echo "$fish_path" | sudo tee -a /etc/shells >/dev/null
 fi
 
-if [ "${SHELL:-}" != "$fish_path" ]; then
+# Compare against the login shell recorded for the account, not $SHELL. $SHELL
+# describes whichever shell chezmoi happens to be running under, so using it
+# here runs chsh - and so prompts for a password - every time apply is invoked
+# from anything other than fish.
+login_shell=$(dscl . -read "/Users/$(id -un)" UserShell 2>/dev/null | awk '{print $2}')
+if [ "$login_shell" != "$fish_path" ]; then
     chsh -s "$fish_path"
 fi
 {{- end -}}
