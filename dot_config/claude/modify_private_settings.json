@@ -1,0 +1,20 @@
+#!/bin/sh
+set -eu
+
+# Claude Code rewrites this file at runtime to record the selected model, the
+# effort level, and other per-machine state. Merge the managed keys into the
+# existing file rather than replacing it, so that state survives chezmoi apply.
+
+CHEZMOI_EXISTING="$(cat)"
+export CHEZMOI_EXISTING
+
+"${CHEZMOI_EXECUTABLE:-chezmoi}" execute-template <<'TEMPLATE'
+{{- $existing := dict -}}
+{{- with env "CHEZMOI_EXISTING" -}}
+{{-   $existing = . | fromJson -}}
+{{- end -}}
+{{- $managed := dict
+      "agentPushNotifEnabled" true
+      "theme" "dark" -}}
+{{ mergeOverwrite $existing $managed | toPrettyJson }}
+TEMPLATE

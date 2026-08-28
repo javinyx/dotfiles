@@ -1,0 +1,20 @@
+#!/bin/sh
+set -eu
+
+# Codex rewrites this file at runtime to record the approval mode and per-project
+# trust levels, which are machine-local by nature. Merge the managed keys into
+# the existing file rather than replacing it.
+
+CHEZMOI_EXISTING="$(cat)"
+export CHEZMOI_EXISTING
+
+"${CHEZMOI_EXECUTABLE:-chezmoi}" execute-template <<'TEMPLATE'
+{{- $existing := dict -}}
+{{- with env "CHEZMOI_EXISTING" -}}
+{{-   $existing = . | fromToml -}}
+{{- end -}}
+{{- $managed := dict "tui" (dict
+      "status_line" (list "model-with-reasoning" "current-dir" "approval-mode" "context-remaining" "five-hour-limit" "weekly-limit")
+      "status_line_use_colors" true) -}}
+{{ mergeOverwrite $existing $managed | toToml }}
+TEMPLATE
