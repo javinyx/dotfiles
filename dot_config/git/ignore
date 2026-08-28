@@ -1,0 +1,12 @@
+# Finder and Spotlight leave these in every directory they touch. Ignoring them
+# globally keeps them out of repositories that have no reason to know about macOS.
+.DS_Store
+._*
+.AppleDouble
+.LSOverride
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
