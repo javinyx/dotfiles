@@ -1,0 +1,13 @@
+{{- if and (eq .chezmoi.os "darwin") .applyMacOSDefaults -}}
+#!/bin/sh
+set -eu
+
+# Emptying the Dock discards whatever is pinned there, so it is kept apart from
+# the ordinary preference writes in 10-. run_once_ is keyed on script contents,
+# which means editing a script re-runs it; isolating the reset here keeps a
+# change to any other macOS default from wiping the Dock a second time.
+defaults write com.apple.dock persistent-apps -array
+defaults write com.apple.dock persistent-others -array
+
+killall Dock 2>/dev/null || true
+{{- end -}}

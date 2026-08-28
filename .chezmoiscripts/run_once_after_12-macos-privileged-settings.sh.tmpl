@@ -1,0 +1,17 @@
+{{- if and (eq .chezmoi.os "darwin") .applyMacOSDefaults -}}
+#!/bin/sh
+set -eu
+
+# Ask for the password up front. These settings used to sit at the end of 10-,
+# where a missing or expired sudo credential aborted the script under `set -e`
+# after the unprivileged half had already been applied, leaving the run
+# half-finished and unrecorded, so the whole thing repeated on the next apply.
+sudo -v
+
+# Energy: display sleep, then system sleep (minutes)
+sudo pmset -b displaysleep 15 sleep 30
+sudo pmset -c displaysleep 30 sleep 60
+
+# Lock screen message
+sudo defaults write /Library/Preferences/com.apple.loginwindow LoginwindowText -string "Don't touch my spaghetti"
+{{- end -}}

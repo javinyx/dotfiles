@@ -2,6 +2,10 @@
 #!/bin/sh
 set -eu
 
+# Preference writes only: everything here is idempotent and needs no privileges,
+# so re-running it after an edit is harmless. Anything that resets state or
+# needs sudo lives in 11- and 12- so that editing this file cannot trigger it.
+
 # Keyboard and text input
 defaults write -g KeyRepeat -int 2
 defaults write -g InitialKeyRepeat -int 15
@@ -56,9 +60,7 @@ defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool
 defaults write -g com.apple.mouse.tapBehavior -int 1
 defaults -currentHost write -g com.apple.mouse.tapBehavior -int 1
 
-# Dock
-defaults write com.apple.dock persistent-apps -array
-defaults write com.apple.dock persistent-others -array
+# Dock behaviour. Emptying the Dock is a reset, so it lives in 11- instead.
 defaults write com.apple.dock show-recents -bool false
 defaults write com.apple.dock autohide -bool true
 defaults write com.apple.dock autohide-delay -float 0
@@ -68,13 +70,6 @@ defaults write com.apple.dock autohide-time-modifier -float 0.2
 defaults -currentHost write com.apple.Spotlight MenuItemHidden -int 1
 defaults -currentHost write com.apple.Spotlight PasteboardHistoryEnabled -bool true
 defaults -currentHost write com.apple.controlcenter BatteryShowPercentage -bool true
-
-# Energy: display sleep, then system sleep (minutes)
-sudo pmset -b displaysleep 15 sleep 30
-sudo pmset -c displaysleep 30 sleep 60
-
-# Lock screen message
-sudo defaults write /Library/Preferences/com.apple.loginwindow LoginwindowText -string "Don't touch my spaghetti"
 
 killall cfprefsd 2>/dev/null || true
 killall ControlCenter 2>/dev/null || true
