@@ -11,6 +11,13 @@ chezmoi init --apply javinyx
 During initialization, chezmoi asks which one-time macOS setup actions to run.
 Destructive cleanup actions default to disabled.
 
+Finder desktop, window, extension, and Trash preferences are configured
+automatically. On a new Mac, set the Finder sidebar once in **Finder → Settings
+→ Sidebar**: enable only Applications, Desktop, Documents, Downloads, iCloud
+Drive, the user home folder, External disks, AirDrop, and Trash. macOS stores
+this list in a machine-specific private archive that is not suitable for
+version control.
+
 Homebrew packages are declared in `~/.config/homebrew/Brewfile`. Chezmoi
 installs Homebrew when necessary and runs `brew bundle` whenever that file
 changes.

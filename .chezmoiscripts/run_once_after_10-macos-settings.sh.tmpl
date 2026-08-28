@@ -18,6 +18,17 @@ defaults write com.apple.WindowManager StageManagerHideWidgets -int 1
 defaults write com.apple.WindowManager AllowLocalClientToDropRemoteWidgets -bool false
 defaults write com.apple.WindowManager EnableStandardClickToShowDesktop -bool false
 
+# Finder
+defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true
+defaults write com.apple.finder ShowHardDrivesOnDesktop -bool false
+defaults write com.apple.finder ShowMountedServersOnDesktop -bool false
+defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool false
+defaults write com.apple.finder NewWindowTarget -string "PfHm"
+defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}/"
+defaults write -g AppleShowAllExtensions -bool true
+defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
+defaults write com.apple.finder FXRemoveOldTrashItems -bool true
+
 # Dock
 defaults write com.apple.dock persistent-apps -array
 defaults write com.apple.dock persistent-others -array
@@ -43,4 +54,5 @@ killall ControlCenter 2>/dev/null || true
 killall SystemUIServer 2>/dev/null || true
 killall WindowManager 2>/dev/null || true
 killall Dock 2>/dev/null || true
+killall Finder 2>/dev/null || true
 {{- end -}}
