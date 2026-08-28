@@ -1,3 +1,8 @@
 [".config/ghostty/shaders/cursor_blaze.glsl"]
     type = "file"
     url = "https://raw.githubusercontent.com/0xhckr/ghostty-shaders/85898f08fcf4a9274e418912098e99e00a5f8350/cursor_blaze.glsl"
+    # The URL is pinned to a commit, so re-fetching buys nothing and makes every
+    # apply and diff depend on the network. The checksum turns a corrupted or
+    # substituted download into an error rather than a silently broken shader.
+    refreshPeriod = "8760h"
+    checksum.sha256 = "81b8a20bba407ae2eaf48566158c07b41e0fc617fdf84c5f286cd8dc247e543c"
