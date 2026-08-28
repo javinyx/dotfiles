@@ -1,0 +1,36 @@
+# Arcade Cabinet - a bespoke retro-game palette for Ghostty.
+#
+# Designed for Monocraft: a pixel font has no anti-aliasing to lean on, so the
+# hues are saturated and well separated rather than tastefully muted. The
+# background carries a slight violet cast, the way an unlit CRT does, instead of
+# being pure black.
+#
+# Unlike the built-in "Retro", every one of the 16 slots is a distinct colour,
+# so syntax highlighting and diffs still work.
+
+background = #0b0a14
+foreground = #d7e5cf
+cursor-color = #ffcc33
+cursor-text = #0b0a14
+selection-background = #2d2b52
+selection-foreground = #ffffff
+
+# normal
+palette = 0=#16142a
+palette = 1=#ff4d5e
+palette = 2=#4ce660
+palette = 3=#ffcc33
+palette = 4=#4d8cff
+palette = 5=#ff5ce6
+palette = 6=#3fe0e0
+palette = 7=#d7e5cf
+
+# bright
+palette = 8=#3d3a63
+palette = 9=#ff8a95
+palette = 10=#8cff9b
+palette = 11=#ffe07a
+palette = 12=#8cb8ff
+palette = 13=#ff9cf0
+palette = 14=#7ff2f2
+palette = 15=#ffffff

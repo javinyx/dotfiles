@@ -110,11 +110,43 @@ runtimes. Project-level `mise.toml` files can override these defaults.
 
 ## Ghostty
 
-Monocraft Nerd Font, the built-in Banana Blueberry theme, and a cursor shader
-pinned to a specific upstream commit and checked against a recorded SHA-256, so
-it is fetched once rather than on every apply and a changed download fails
-loudly. Remove or comment the `custom-shader` line if the shader causes
-rendering problems.
+Monocraft Nerd Font at 15pt, with a bespoke look rather than a stock one.
+
+Themes in `~/.config/ghostty/themes` take precedence over the 463 shipped inside
+`Ghostty.app`, so the palette is version-controlled here:
+
+- **arcade-cabinet** is the default. Saturated, well-separated hues on a
+  near-black background with a faint violet cast, chosen because a pixel font
+  has no anti-aliasing to soften colour edges. All 16 palette slots are
+  distinct, so syntax highlighting and diffs still carry information - unlike
+  the built-in "Retro", where every slot is the same green.
+- **game-boy** is the authentic four-shade DMG-01 palette. A novelty: with four
+  greens there is no colour information left to highlight with.
+
+Shaders run in the order listed in the config. `cursor_blaze` comes first so the
+CRT pass treats the cursor trail as part of the image:
+
+- **arcade-crt.glsl** does scanlines, an aperture-grille phosphor mask, a
+  vignette and slight chromatic aberration. Flat by default - barrel distortion
+  is what makes most CRT shaders tiring to work in, since it bends text near the
+  edges - but `CURVATURE` at the top turns it on.
+- **gameboy.glsl** quantises the screen to the four DMG greens with a 2x2
+  ordered dither. Pairs with the game-boy theme.
+
+Every effect is a named constant at the top of its shader; they are meant to be
+edited. `cursor_blaze` is fetched from upstream, pinned to a commit and checked
+against a recorded SHA-256, so it is downloaded once rather than on every apply
+and a changed download fails loudly.
+
+Ghostty ignores a shader that fails to compile and reports it only in the log,
+never as a config error, so `ghostty +validate-config` passing does not mean the
+shaders work. Check with:
+
+```sh
+log show --last 5m --predicate 'process == "ghostty"' --style compact | grep -i shader
+```
+
+Remove or comment the `custom-shader` lines if they cause rendering problems.
 
 ## VS Code profiles
 

@@ -1,7 +1,10 @@
 font-family = Monocraft
 font-size = 15
 
-theme = Banana Blueberry
+# Bespoke themes live in ~/.config/ghostty/themes and take precedence over the
+# ones shipped inside Ghostty.app. Swap to game-boy for the four-shade DMG look.
+theme = arcade-cabinet
+# theme = game-boy
 background-opacity = 0.98
 
 window-padding-x = 12
@@ -12,5 +15,13 @@ macos-titlebar-style = transparent
 cursor-style = block
 cursor-style-blink = false
 
+# Shaders run in the order listed. The cursor trail goes first so the CRT pass
+# treats it as part of the image, rather than laying a crisp trail over a
+# scanlined background.
 custom-shader = shaders/cursor_blaze.glsl
+custom-shader = shaders/arcade-crt.glsl
+
+# Swap the CRT pass for the Game Boy quantiser, ideally with theme = game-boy:
+# custom-shader = shaders/gameboy.glsl
+
 custom-shader-animation = true

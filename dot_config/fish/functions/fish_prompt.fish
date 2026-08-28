@@ -20,12 +20,16 @@ function fish_prompt
         printf ' %s' "$branch"
     end
 
+    # A play button when the last command succeeded; the actual exit code when it
+    # did not. The old prompt signalled failure with colour alone, which meant
+    # re-running $status by hand to find out what had happened.
     if test $last_status -eq 0
         set_color green
+        printf ' ▶ '
     else
         set_color red
+        printf ' ✖ %d ' $last_status
     end
 
-    printf ' ❯ '
     set_color normal
 end

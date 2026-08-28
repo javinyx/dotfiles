@@ -1,0 +1,32 @@
+# Game Boy - the authentic four-shade DMG-01 palette.
+#
+# A novelty rather than a daily driver: with only four greens available, every
+# palette slot collapses onto one of them, so syntax highlighting and diff
+# colours carry no information. Switch to it for fun, not for work.
+
+background = #0f380f
+foreground = #9bbc0f
+cursor-color = #9bbc0f
+cursor-text = #0f380f
+selection-background = #8bac0f
+selection-foreground = #0f380f
+
+# normal - dark shades
+palette = 0=#0f380f
+palette = 1=#306230
+palette = 2=#8bac0f
+palette = 3=#9bbc0f
+palette = 4=#306230
+palette = 5=#8bac0f
+palette = 6=#8bac0f
+palette = 7=#9bbc0f
+
+# bright - lighter shades
+palette = 8=#306230
+palette = 9=#8bac0f
+palette = 10=#9bbc0f
+palette = 11=#9bbc0f
+palette = 12=#8bac0f
+palette = 13=#9bbc0f
+palette = 14=#9bbc0f
+palette = 15=#9bbc0f
