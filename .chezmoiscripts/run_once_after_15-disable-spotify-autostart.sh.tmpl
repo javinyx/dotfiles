@@ -2,6 +2,16 @@
 #!/bin/sh
 set -eu
 
+# Nothing in this script varies with the source state, so run_onchange_ only ever
+# behaved like run_once_. Name it for what it does.
+
+# Skip rather than create Spotify's application support directory on a machine
+# that does not have Spotify. brew bundle runs earlier in the same apply, so the
+# app is present by now whenever the Brewfile asks for it.
+if [ ! -d /Applications/Spotify.app ]; then
+    exit 0
+fi
+
 # Spotify: do not start automatically at login
 spotify_prefs="$HOME/Library/Application Support/Spotify/prefs"
 mkdir -p "$(dirname "$spotify_prefs")"
