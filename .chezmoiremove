@@ -1,2 +1,3 @@
 .config/ghostty/shaders/crt.glsl
 .config/ghostty/shaders/bloom.glsl
+.config/fish/conf.d/mise.fish
