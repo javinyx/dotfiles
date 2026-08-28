@@ -39,3 +39,6 @@
 
 [includeIf "gitdir:~/Projects/Personal/"]
     path = ~/.config/git/personal.inc
+
+[includeIf "gitdir:~/.local/share/chezmoi/"]
+    path = ~/.config/git/personal.inc
