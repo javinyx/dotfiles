@@ -1,0 +1,4 @@
+{
+  "name": "Personal",
+  "extensions": "[{\"identifier\":{\"id\":\"oxc.oxc-vscode\"},\"displayName\":\"Oxc\"}]"
+}

@@ -31,6 +31,13 @@ defaults -currentHost write com.apple.Spotlight MenuItemHidden -int 1
 defaults -currentHost write com.apple.Spotlight PasteboardHistoryEnabled -bool true
 defaults -currentHost write com.apple.controlcenter BatteryShowPercentage -bool true
 
+# Energy: display sleep, then system sleep (minutes)
+sudo pmset -b displaysleep 15 sleep 30
+sudo pmset -c displaysleep 30 sleep 60
+
+# Lock screen message
+sudo defaults write /Library/Preferences/com.apple.loginwindow LoginwindowText -string "Don't touch my spaghetti"
+
 killall cfprefsd 2>/dev/null || true
 killall ControlCenter 2>/dev/null || true
 killall SystemUIServer 2>/dev/null || true

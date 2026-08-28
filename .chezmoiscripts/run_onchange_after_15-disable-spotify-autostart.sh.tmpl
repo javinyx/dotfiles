@@ -1,0 +1,16 @@
+{{- if eq .chezmoi.os "darwin" -}}
+#!/bin/sh
+set -eu
+
+# Spotify: do not start automatically at login
+spotify_prefs="$HOME/Library/Application Support/Spotify/prefs"
+mkdir -p "$(dirname "$spotify_prefs")"
+if [ -f "$spotify_prefs" ] && grep -q '^app.autostart-mode=' "$spotify_prefs"; then
+    sed -i '' 's/^app\.autostart-mode=.*/app.autostart-mode="off"/' "$spotify_prefs"
+else
+    printf '%s\n' 'app.autostart-mode="off"' >>"$spotify_prefs"
+fi
+
+# Remove the legacy login item too, when present.
+osascript -e 'tell application "System Events" to delete every login item whose name is "Spotify"' 2>/dev/null || true
+{{- end -}}
