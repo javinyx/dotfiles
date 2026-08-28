@@ -11,8 +11,14 @@ chezmoi init --apply javinyx
 During initialization, chezmoi asks which one-time macOS setup actions to run.
 Destructive cleanup actions default to disabled.
 
-Finder desktop, window, extension, and Trash preferences are configured
-automatically. On a new Mac, set the Finder sidebar once in **Finder → Settings
+Finder desktop, window, path/status bar, extension, and Trash preferences are
+configured automatically. Hidden files stay hidden by default and can be
+toggled in Finder with **Cmd-Shift-.**. Screenshots are stored in
+`~/Pictures/Screenshots`; network and removable drives do not receive
+`.DS_Store` files. Keyboard repeat and tap-to-click are also configured. On a
+new Mac, `Cmd-Shift-3/4` copies screenshots to the clipboard and adding
+`Control` saves them to the screenshots folder; `Cmd-Shift-5` retains the
+standard Screenshot toolbar. Set the Finder sidebar once in **Finder → Settings
 → Sidebar**: enable only Applications, Desktop, Documents, Downloads, iCloud
 Drive, the user home folder, External disks, AirDrop, and Trash. macOS stores
 this list in a machine-specific private archive that is not suitable for
@@ -47,8 +53,11 @@ runtimes. Project-level `mise.toml` files can override these defaults.
 
 Version-controlled VS Code profile exports live in
 `~/.config/vscode/profiles`. Import them from **Profiles: New Profile...** →
-**Import Profile...** in the Command Palette. The Personal profile contains
-only the Oxc extension.
+**Import Profile...** in the Command Palette. The Default export captures the
+shared base UI preferences. Personal adds the Oxc extension and the Light 2026
+theme; Work adds Flow Icons with its Flow Dim icon theme and the Dark 2026
+color theme. Flow Icons license information is private and must not be added to
+the profile export.
 
 After changing a profile in VS Code, export it to the same local file and run
 `chezmoi re-add ~/.config/vscode/profiles/<name>.code-profile` to update the

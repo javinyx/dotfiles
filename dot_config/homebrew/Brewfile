@@ -1,7 +1,11 @@
 brew "chezmoi"
+brew "fd"
 brew "fish"
+brew "gh"
+brew "jq"
 brew "mise"
 brew "mole"
+brew "ripgrep"
 
 cask "1password"
 cask "1password-cli"

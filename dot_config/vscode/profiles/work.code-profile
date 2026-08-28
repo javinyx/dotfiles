@@ -1,0 +1,5 @@
+{
+  "name": "Work",
+  "settings": "{\"settings\":\"{\\n  \\\"workbench.colorTheme\\\": \\\"Dark 2026\\\",\\n  \\\"workbench.iconTheme\\\": \\\"flow-dim\\\"\\n}\"}",
+  "extensions": "[{\"identifier\":{\"id\":\"thang-nm.flow-icons\"},\"displayName\":\"Flow Icons\"}]"
+}

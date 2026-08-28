@@ -1,4 +1,5 @@
 {
   "name": "Personal",
+  "settings": "{\"settings\":\"{\\n  \\\"workbench.colorTheme\\\": \\\"Light 2026\\\"\\n}\"}",
   "extensions": "[{\"identifier\":{\"id\":\"oxc.oxc-vscode\"},\"displayName\":\"Oxc\"}]"
 }

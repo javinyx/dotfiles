@@ -3,6 +3,8 @@
 set -eu
 
 # Keyboard and text input
+defaults write -g KeyRepeat -int 2
+defaults write -g InitialKeyRepeat -int 15
 defaults write -g NSAutomaticSpellingCorrectionEnabled -bool false
 defaults write -g NSAutomaticCapitalizationEnabled -bool false
 defaults write -g NSAutomaticInlinePredictionEnabled -bool false
@@ -25,9 +27,34 @@ defaults write com.apple.finder ShowMountedServersOnDesktop -bool false
 defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool false
 defaults write com.apple.finder NewWindowTarget -string "PfHm"
 defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}/"
+defaults write com.apple.finder ShowPathbar -bool true
+defaults write com.apple.finder ShowStatusBar -bool true
 defaults write -g AppleShowAllExtensions -bool true
+defaults write com.apple.finder AppleShowAllFiles -bool false
 defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
 defaults write com.apple.finder FXRemoveOldTrashItems -bool true
+defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
+
+# Screenshots
+mkdir -p "${HOME}/Pictures/Screenshots"
+defaults write com.apple.screencapture location -string "${HOME}/Pictures/Screenshots"
+# Invert the full-screen and selection shortcuts: Cmd-Shift copies to the
+# clipboard, while adding Control saves a file in the location above.
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 28 \
+  '{ enabled = 1; value = { parameters = (51, 20, 1441792); type = standard; }; }'
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 29 \
+  '{ enabled = 1; value = { parameters = (51, 20, 1179648); type = standard; }; }'
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 30 \
+  '{ enabled = 1; value = { parameters = (52, 21, 1441792); type = standard; }; }'
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 31 \
+  '{ enabled = 1; value = { parameters = (52, 21, 1179648); type = standard; }; }'
+
+# Trackpad: tap to click, with the standard macOS gestures left enabled
+defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
+defaults write -g com.apple.mouse.tapBehavior -int 1
+defaults -currentHost write -g com.apple.mouse.tapBehavior -int 1
 
 # Dock
 defaults write com.apple.dock persistent-apps -array

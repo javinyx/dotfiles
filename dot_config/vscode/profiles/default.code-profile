@@ -1,0 +1,4 @@
+{
+  "name": "Default",
+  "settings": "{\"settings\":\"{\\n  \\\"chat.titleBar.openInAgentsWindow.enabled\\\": false,\\n  \\\"window.commandCenter\\\": false,\\n  \\\"workbench.activityBar.location\\\": \\\"top\\\",\\n  \\\"workbench.browser.showInTitleBar\\\": false,\\n  \\\"workbench.layoutControl.enabled\\\": false,\\n  \\\"workbench.navigationControl.enabled\\\": false,\\n  \\\"workbench.sideBar.location\\\": \\\"right\\\",\\n  \\\"workbench.startupEditor\\\": \\\"none\\\",\\n  \\\"workbench.settings.applyToAllProfiles\\\": [\\n    \\\"chat.titleBar.openInAgentsWindow.enabled\\\",\\n    \\\"window.commandCenter\\\",\\n    \\\"workbench.activityBar.location\\\",\\n    \\\"workbench.browser.showInTitleBar\\\",\\n    \\\"workbench.layoutControl.enabled\\\",\\n    \\\"workbench.navigationControl.enabled\\\",\\n    \\\"workbench.sideBar.location\\\",\\n    \\\"workbench.startupEditor\\\"\\n  ]\\n}\"}"
+}
