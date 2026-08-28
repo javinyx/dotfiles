@@ -46,3 +46,14 @@ only the Oxc extension.
 After changing a profile in VS Code, export it to the same local file and run
 `chezmoi re-add ~/.config/vscode/profiles/<name>.code-profile` to update the
 source copy. Settings Sync is not required for these profiles.
+
+## Codex
+
+Codex uses `~/.config/codex` as `CODEX_HOME`, configured by Fish. Portable
+preferences such as the TUI status line are version-controlled there, while
+authentication, sessions, memories, logs, caches, and other generated state
+remain local and are intentionally excluded from the repository.
+
+Claude Code is installed from Homebrew's `claude-code@latest` cask and uses
+`~/.config/claude` as `CLAUDE_CONFIG_DIR`. Only portable settings are managed;
+credentials, sessions, plugins, and generated state remain local.
