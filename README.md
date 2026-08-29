@@ -205,3 +205,14 @@ reappear whenever either tool writes its own.
 
 Credentials, sessions, plugins, memories, logs, and caches remain local and are
 intentionally excluded from the repository.
+
+## Agent instructions
+
+`~/AGENTS.md` holds the rules any coding agent should follow, with
+`~/CLAUDE.md` as a symlink to it so Claude Code and Codex read the same file
+rather than two copies that drift apart. Both sit at the top of the home
+directory deliberately: agents search upwards from the working directory, so a
+single file at `$HOME` covers every project beneath it.
+
+It currently covers sole authorship on commits, when a comment is justified, and
+which decisions need asking about first.
