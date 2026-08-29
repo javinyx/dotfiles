@@ -6,3 +6,11 @@
     # substituted download into an error rather than a silently broken shader.
     refreshPeriod = "8760h"
     checksum.sha256 = "81b8a20bba407ae2eaf48566158c07b41e0fc617fdf84c5f286cd8dc247e543c"
+
+[".config/ghostty/shaders/dot-matrix.glsl"]
+    type = "file"
+    url = "https://raw.githubusercontent.com/luiscarlospando/crt-shader-with-chromatic-aberration-glow-scanlines-dot-matrix/0013c052a139dade5d1b92245f5493a566ef486d/crt-shader-with-chromatic-aberration-glow-scanlines-dot-matrix.glsl"
+    # Heavier CRT than arcade-crt: chromatic aberration, glow and a dot mask.
+    # Pinned to a commit and checksummed for the same reasons as cursor_blaze.
+    refreshPeriod = "8760h"
+    checksum.sha256 = "67e8849c5a1c9c37f14331c53e64be84497668de0b52dd5d46dc77077e84991e"

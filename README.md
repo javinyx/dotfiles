@@ -123,24 +123,49 @@ Themes in `~/.config/ghostty/themes` take precedence over the 463 shipped inside
 - **game-boy** is the authentic four-shade DMG-01 palette. A novelty: with four
   greens there is no colour information left to highlight with.
 
-Shaders run in the order listed in the config. `cursor_blaze` comes first so the
-CRT pass treats the cursor trail as part of the image:
+Shaders run in the order listed in the config, each receiving the previous
+one's output, so order matters:
 
+- **starfield.glsl** drifts parallax stars behind the text. A shader only ever
+  receives the finished image, so there is no "behind" to draw into: it compares
+  each pixel against `iBackgroundColor` and adds stars only where the terminal
+  is showing background, leaving text and selections untouched. It must run
+  before any CRT pass, which would alter those background pixels.
+- **cursor_blaze.glsl** is the upstream cursor trail, placed before the CRT pass
+  so the trail gets scanlined along with everything else.
 - **arcade-crt.glsl** does scanlines, an aperture-grille phosphor mask, a
   vignette and slight chromatic aberration. Flat by default - barrel distortion
   is what makes most CRT shaders tiring to work in, since it bends text near the
   edges - but `CURVATURE` at the top turns it on.
+- **coin-flash.glsl** expands a gold ring on every cursor move. Use instead of
+  `cursor_blaze`, not alongside it.
+- **dot-matrix.glsl** is a heavier upstream CRT with glow and a dot mask.
 - **gameboy.glsl** quantises the screen to the four DMG greens with a 2x2
   ordered dither. Pairs with the game-boy theme.
 
 Every effect is a named constant at the top of its shader; they are meant to be
-edited. `cursor_blaze` is fetched from upstream, pinned to a commit and checked
-against a recorded SHA-256, so it is downloaded once rather than on every apply
-and a changed download fails loudly.
+edited. Upstream shaders are pinned to a commit and checksummed, so they are
+downloaded once rather than on every apply and a changed download fails loudly.
 
 Ghostty ignores a shader that fails to compile and reports it only in the log,
-never as a config error, so `ghostty +validate-config` passing does not mean the
-shaders work. Check with:
+never as a config error, so `ghostty +validate-config` passing says nothing about
+whether the shaders work. Check a shader before committing it by wrapping it in
+the Shadertoy preamble Ghostty injects and compiling that with `glslang`:
+
+```sh
+{ printf '#version 450\n'
+  printf 'uniform vec3 iResolution; uniform float iTime, iTimeCursorChange;\n'
+  printf 'uniform vec4 iCurrentCursor, iPreviousCursor;\n'
+  printf 'uniform vec3 iBackgroundColor, iForegroundColor, iCursorColor;\n'
+  printf 'uniform sampler2D iChannel0;\n'
+  printf 'out vec4 fc;\n'
+  cat shaders/arcade-crt.glsl
+  printf 'void main(){ mainImage(fc, gl_FragCoord.xy); }\n'
+} > /tmp/t.frag && glslangValidator -S frag /tmp/t.frag
+```
+
+Validate a known-good upstream shader the same way first: if that fails too, the
+preamble is wrong rather than the shader. At runtime, failures appear only here:
 
 ```sh
 log show --last 5m --predicate 'process == "ghostty"' --style compact | grep -i shader
