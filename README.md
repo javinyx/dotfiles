@@ -137,8 +137,9 @@ one's output, so order matters:
   vignette and slight chromatic aberration. Flat by default - barrel distortion
   is what makes most CRT shaders tiring to work in, since it bends text near the
   edges - but `CURVATURE` at the top turns it on.
-- **coin-flash.glsl** expands a gold ring on every cursor move. Use instead of
-  `cursor_blaze`, not alongside it.
+- **coin-flash.glsl** expands a gold ring on every cursor move, driven by
+  `iTimeCursorChange`. It runs alongside `cursor_blaze`; either can be dropped
+  if four passes is too busy.
 - **dot-matrix.glsl** is a heavier upstream CRT with glow and a dot mask.
 - **gameboy.glsl** quantises the screen to the four DMG greens with a 2x2
   ordered dither. Pairs with the game-boy theme.
@@ -149,8 +150,10 @@ downloaded once rather than on every apply and a changed download fails loudly.
 
 Ghostty ignores a shader that fails to compile and reports it only in the log,
 never as a config error, so `ghostty +validate-config` passing says nothing about
-whether the shaders work. Check a shader before committing it by wrapping it in
-the Shadertoy preamble Ghostty injects and compiling that with `glslang`:
+whether the shaders work. To check one before committing it, wrap it in the
+Shadertoy preamble Ghostty injects and compile that. This needs `glslang`, which
+is deliberately not in the Brewfile - install it for the occasion with `brew
+install glslang` and remove it afterwards:
 
 ```sh
 { printf '#version 450\n'

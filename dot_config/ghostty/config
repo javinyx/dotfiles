@@ -17,15 +17,15 @@ cursor-style-blink = false
 
 # Shaders run in the order listed, each receiving the previous one's output.
 # starfield must precede arcade-crt: it decides where to draw by comparing each
-# pixel to the background colour, which the CRT pass alters. cursor_blaze sits
-# before the CRT so the trail gets scanlined along with everything else.
+# pixel to the background colour, which the CRT pass alters. The two cursor
+# effects sit before the CRT so their trails get scanlined along with the rest.
 custom-shader = shaders/starfield.glsl
 custom-shader = shaders/cursor_blaze.glsl
+custom-shader = shaders/coin-flash.glsl
 custom-shader = shaders/arcade-crt.glsl
 
-# Other passes, all verified to compile. Drop any line above to lighten the load.
-#   shaders/coin-flash.glsl  gold ring on each cursor move - use instead of
-#                            cursor_blaze rather than alongside it
+# Four passes is the busiest this gets. If it is too much, cursor_blaze and
+# coin-flash are both cursor effects and either can go.
 #   shaders/dot-matrix.glsl  heavier upstream CRT: aberration, glow, dot mask
 #   shaders/gameboy.glsl     four-shade DMG quantiser, with theme = game-boy
 
