@@ -73,7 +73,7 @@ ssh appends to it as you connect to new hosts.
 
 ## macOS settings
 
-Three scripts, deliberately separate because `run_once_` is keyed on script
+Four scripts, deliberately separate because `run_once_` is keyed on script
 contents and so re-runs whenever the script is edited:
 
 | Script | Contents |
@@ -81,6 +81,7 @@ contents and so re-runs whenever the script is edited:
 | `10-macos-settings` | Idempotent preference writes. Safe to re-run. |
 | `11-macos-dock-reset` | Empties the Dock. Isolated so editing an unrelated default does not discard what is pinned there. |
 | `12-macos-privileged-settings` | Sleep timings and the lock screen message. Asks for your password first. |
+| `13-finder-sidebar` | Adds Pictures to the Finder sidebar favourites. Additive, so entries added by hand survive. |
 
 Script 12 needs a terminal that can prompt for a password. Running `chezmoi
 apply` somewhere without one — a non-interactive shell, or through a tool that
@@ -97,10 +98,15 @@ folder; `Cmd-Shift-5` retains the standard Screenshot toolbar.
 The menu bar carries the VPN status extra, which shows the time connected once a
 tunnel is up.
 
-Set the Finder sidebar once in **Finder → Settings → Sidebar**: enable only
+Script 13 adds Pictures to the sidebar favourites. macOS keeps that list in a
+machine-specific private archive with no preferences domain, so it is written
+through `LSSharedFileList` rather than checked in. The API has been deprecated
+since 10.11 and remains the only public one; `mysides`, the usual wrapper, was
+disabled in Homebrew in October 2025.
+
+Set the remaining entries once in **Finder → Settings → Sidebar**: enable
 Applications, Desktop, Documents, Downloads, iCloud Drive, the user home folder,
-External disks, AirDrop, and Trash. macOS stores this list in a machine-specific
-private archive that is not suitable for version control.
+External disks, AirDrop, and Trash.
 
 ## Packages
 

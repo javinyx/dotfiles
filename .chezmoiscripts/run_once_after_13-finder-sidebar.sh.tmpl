@@ -1,0 +1,97 @@
+{{- if and (eq .chezmoi.os "darwin") .applyMacOSDefaults -}}
+#!/bin/sh
+set -eu
+
+# The Finder sidebar has no preferences domain: favourites live in a binary
+# plist owned by sharedfilelistd, which TCC blocks from being edited directly.
+# The supported route is LSSharedFileList, deprecated since 10.11 but still the
+# only public API and still present in macOS 26. mysides used to wrap it; the
+# Homebrew cask was disabled in October 2025, so the API is called here instead.
+# Existing favourites are left alone, so anything added by hand survives.
+/usr/bin/python3 - "${HOME}/Pictures" <<'PYTHON'
+import ctypes
+import sys
+
+core_foundation = ctypes.CDLL(
+    "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation"
+)
+core_services = ctypes.CDLL(
+    "/System/Library/Frameworks/CoreServices.framework/CoreServices"
+)
+
+REF = ctypes.c_void_p
+UTF8 = 0x08000100
+POSIX_PATH = 0
+RESOLVE_WITHOUT_MOUNTING_OR_PROMPTING = (1 << 0) | (1 << 1)
+
+for function, restype, argtypes in (
+    (core_foundation.CFStringCreateWithCString, REF, [REF, ctypes.c_char_p, ctypes.c_uint32]),
+    (core_foundation.CFStringGetCString, ctypes.c_bool, [REF, ctypes.c_char_p, ctypes.c_long, ctypes.c_uint32]),
+    (core_foundation.CFURLCreateWithFileSystemPath, REF, [REF, REF, ctypes.c_long, ctypes.c_bool]),
+    (core_foundation.CFURLCopyFileSystemPath, REF, [REF, ctypes.c_long]),
+    (core_foundation.CFArrayGetCount, ctypes.c_long, [REF]),
+    (core_foundation.CFArrayGetValueAtIndex, REF, [REF, ctypes.c_long]),
+    (core_services.LSSharedFileListCreate, REF, [REF, REF, REF]),
+    (core_services.LSSharedFileListCopySnapshot, REF, [REF, ctypes.POINTER(ctypes.c_uint32)]),
+    (core_services.LSSharedFileListItemCopyResolvedURL, REF, [REF, ctypes.c_uint32, REF]),
+    (core_services.LSSharedFileListInsertItemURL, REF, [REF, REF, REF, REF, REF, REF, REF]),
+):
+    function.restype = restype
+    function.argtypes = argtypes
+
+FAVORITES = REF.in_dll(core_services, "kLSSharedFileListFavoriteItems")
+LAST = REF.in_dll(core_services, "kLSSharedFileListItemLast")
+
+
+def to_cfstring(value):
+    return core_foundation.CFStringCreateWithCString(None, value.encode(), UTF8)
+
+
+def to_str(cfstring):
+    buffer = ctypes.create_string_buffer(4096)
+    if not core_foundation.CFStringGetCString(cfstring, buffer, 4096, UTF8):
+        return None
+    return buffer.value.decode()
+
+
+def to_cfurl(path):
+    return core_foundation.CFURLCreateWithFileSystemPath(
+        None, to_cfstring(path), POSIX_PATH, True
+    )
+
+
+def favorite_paths(favorites):
+    seed = ctypes.c_uint32(0)
+    snapshot = core_services.LSSharedFileListCopySnapshot(favorites, ctypes.byref(seed))
+    if not snapshot:
+        return set()
+    paths = set()
+    for index in range(core_foundation.CFArrayGetCount(snapshot)):
+        item = core_foundation.CFArrayGetValueAtIndex(snapshot, index)
+        url = core_services.LSSharedFileListItemCopyResolvedURL(
+            item, RESOLVE_WITHOUT_MOUNTING_OR_PROMPTING, None
+        )
+        if not url:
+            continue
+        path = to_str(core_foundation.CFURLCopyFileSystemPath(url, POSIX_PATH))
+        if path:
+            paths.add(path.rstrip("/"))
+    return paths
+
+
+favorites = core_services.LSSharedFileListCreate(None, FAVORITES, None)
+if not favorites:
+    sys.exit("could not open the Finder favourites list")
+
+present = favorite_paths(favorites)
+for path in sys.argv[1:]:
+    if path.rstrip("/") in present:
+        continue
+    if not core_services.LSSharedFileListInsertItemURL(
+        favorites, LAST, None, None, to_cfurl(path), None, None
+    ):
+        sys.exit("could not add {} to the Finder sidebar".format(path))
+PYTHON
+
+killall Finder 2>/dev/null || true
+{{- end -}}
