@@ -34,7 +34,7 @@ defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}/"
 defaults write com.apple.finder ShowPathbar -bool true
 defaults write com.apple.finder ShowStatusBar -bool true
 defaults write -g AppleShowAllExtensions -bool true
-defaults write com.apple.finder AppleShowAllFiles -bool false
+defaults write com.apple.finder AppleShowAllFiles -bool true
 defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
 defaults write com.apple.finder FXRemoveOldTrashItems -bool true
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
@@ -70,6 +70,12 @@ defaults write com.apple.dock autohide-time-modifier -float 0.2
 defaults -currentHost write com.apple.Spotlight MenuItemHidden -int 1
 defaults -currentHost write com.apple.Spotlight PasteboardHistoryEnabled -bool true
 defaults -currentHost write com.apple.controlcenter BatteryShowPercentage -bool true
+
+# VPN is still a SystemUIServer menu extra rather than a Control Center item, so
+# it is enabled by listing its bundle. Assigning the array wholesale rather than
+# using -array-add keeps a re-run from appending the same entry a second time.
+defaults write com.apple.systemuiserver menuExtras -array "/System/Library/CoreServices/Menu Extras/VPN.menu"
+defaults write com.apple.networkConnect VPNShowTime -bool true
 
 killall cfprefsd 2>/dev/null || true
 killall ControlCenter 2>/dev/null || true

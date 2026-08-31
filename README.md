@@ -86,13 +86,16 @@ Script 12 needs a terminal that can prompt for a password. Running `chezmoi
 apply` somewhere without one — a non-interactive shell, or through a tool that
 does not allocate a tty — fails with `sudo: a terminal is required`.
 
-Finder desktop, window, path/status bar, extension, and Trash preferences are
-configured automatically. Hidden files stay hidden by default and can be toggled
-in Finder with **Cmd-Shift-.**. Screenshots are stored in `~/Pictures/Screenshots`;
+Finder desktop, window, path/status bar, extension, hidden-file, and Trash
+preferences are configured automatically. Hidden files are shown by default and
+can be toggled in Finder with **Cmd-Shift-.**. Screenshots are stored in `~/Pictures/Screenshots`;
 network and removable drives do not receive `.DS_Store` files. Keyboard repeat
 and tap-to-click are also configured. On a new Mac, `Cmd-Shift-3/4` copies
 screenshots to the clipboard and adding `Control` saves them to the screenshots
 folder; `Cmd-Shift-5` retains the standard Screenshot toolbar.
+
+The menu bar carries the VPN status extra, which shows the time connected once a
+tunnel is up.
 
 Set the Finder sidebar once in **Finder → Settings → Sidebar**: enable only
 Applications, Desktop, Documents, Downloads, iCloud Drive, the user home folder,
