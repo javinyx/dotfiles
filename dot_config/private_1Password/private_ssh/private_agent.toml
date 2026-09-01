@@ -1,0 +1,7 @@
+[[ssh-keys]]
+item = "Development SSH"
+vault = "Development"
+
+[[ssh-keys]]
+item = "Work SSH"
+vault = "Work"
