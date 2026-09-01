@@ -66,6 +66,11 @@ defaults write com.apple.dock autohide -bool true
 defaults write com.apple.dock autohide-delay -float 0
 defaults write com.apple.dock autohide-time-modifier -float 0.2
 
+# macOS binds the bottom-right corner to Quick Note out of the box. 1 is the
+# value the Hot Corners menu writes for "-".
+defaults write com.apple.dock wvous-br-corner -int 1
+defaults write com.apple.dock wvous-br-modifier -int 0
+
 # Control Center and Spotlight
 defaults -currentHost write com.apple.Spotlight MenuItemHidden -int 1
 defaults -currentHost write com.apple.Spotlight PasteboardHistoryEnabled -bool true
@@ -76,6 +81,11 @@ defaults -currentHost write com.apple.controlcenter BatteryShowPercentage -bool 
 # using -array-add keeps a re-run from appending the same entry a second time.
 defaults write com.apple.systemuiserver menuExtras -array "/System/Library/CoreServices/Menu Extras/VPN.menu"
 defaults write com.apple.networkConnect VPNShowTime -bool true
+
+# Symbolic hotkey changes are only picked up at login unless the settings are
+# reloaded explicitly, so the screenshot bindings above would not apply until
+# the next one.
+/System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
 
 killall cfprefsd 2>/dev/null || true
 killall ControlCenter 2>/dev/null || true
