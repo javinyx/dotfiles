@@ -3,7 +3,7 @@
 Personal macOS dotfiles, applied with [`mise bootstrap`](https://mise.jdx.dev/bootstrap.html).
 
 This repository is the global mise configuration. It is checked out at
-`~/Projects/Personal/dotfiles`, and `~/.config/mise` is a symlink to it, so
+`~/Projects/Personal/javinyx/dotfiles`, and `~/.config/mise` is a symlink to it, so
 `config.toml` at its root is the file every mise command reads. The config
 refers to itself only through `~/.config/mise`, so moving the checkout means
 repointing that one link. That one file declares the packages, dotfiles, macOS preferences, login
@@ -14,8 +14,8 @@ the setup steps nothing declarative covers.
 
 ```sh
 curl -fsSL https://mise.run | sh
-git clone https://github.com/javinyx/dotfiles.git ~/Projects/Personal/dotfiles
-ln -s ~/Projects/Personal/dotfiles ~/.config/mise
+git clone https://github.com/javinyx/dotfiles.git ~/Projects/Personal/javinyx/dotfiles
+mkdir -p ~/.config && ln -s ~/Projects/Personal/javinyx/dotfiles ~/.config/mise
 ~/.local/bin/mise bootstrap
 ```
 
@@ -43,7 +43,7 @@ fails with `sudo: a terminal is required`.
 mise bootstrap --dry-run   # preview every part
 mise bootstrap             # apply every part
 mise dot status            # dotfile drift only
-git -C ~/Projects/Personal/dotfiles pull && mise bootstrap
+git -C ~/Projects/Personal/javinyx/dotfiles pull && mise bootstrap
 ```
 
 Most files in `~` are symlinks into `home/`, so editing them edits the
@@ -52,8 +52,7 @@ rather than linked, and are listed under [Dotfiles](#dotfiles).
 
 ## Dotfiles
 
-`home/` mirrors the home directory, with `dot-` standing in for a leading `.` so
-the tree stays visible: `home/dot-config/fish/config.fish` deploys to
+`home/` mirrors the home directory: `home/.config/fish/config.fish` deploys to
 `~/.config/fish/config.fish`. Every file is linked individually, so files an
 application creates beside them, such as `fish_variables` or the downloaded
 shaders, stay local and untracked.
@@ -278,7 +277,7 @@ installed from Homebrew's `claude-code@latest` cask.
 Both tools rewrite their own configuration at runtime — the selected model and
 effort level, the approval mode, per-project trust levels — so these files are
 `merge = true` entries: the bootstrap sets only the keys in
-`home/dot-config/claude/settings.json` and `home/dot-config/codex/config.toml`,
+`home/.config/claude/settings.json` and `home/.config/codex/config.toml`,
 and everything else in the live file stays the application's. Replacing the
 files outright would discard that state on every bootstrap. TOML is edited in
 place and JSON keeps its key order, so the tools' own formatting survives and

@@ -188,16 +188,15 @@ run = [
 root = "~/.config/mise/home"
 target = "~"
 mode = "symlink-each"
-dot_prefix = true
-exclude = ["dot-config/claude/settings.json", "dot-config/codex/config.toml"]
+exclude = [".config/claude/settings.json", ".config/codex/config.toml"]
 
 [dotfile_groups.home.entries]
-"~/.config/git/allowed_signers" = { source = "dot-config/git/allowed_signers.tera", mode = "template", permissions = "0600" }
-"~/.config/git/personal.inc" = { source = "dot-config/git/personal.inc.tera", mode = "template", permissions = "0600" }
-"~/.config/git/work.inc" = { source = "dot-config/git/work.inc.tera", mode = "template", permissions = "0600" }
-"~/.ssh/config" = { source = "dot-ssh/config.tera", mode = "template", permissions = "0600" }
-"~/.ssh/development.pub" = { source = "dot-ssh/development.pub.tera", mode = "template" }
-"~/.ssh/work.pub" = { source = "dot-ssh/work.pub.tera", mode = "template" }
+"~/.config/git/allowed_signers" = { source = ".config/git/allowed_signers.tera", mode = "template", permissions = "0600" }
+"~/.config/git/personal.inc" = { source = ".config/git/personal.inc.tera", mode = "template", permissions = "0600" }
+"~/.config/git/work.inc" = { source = ".config/git/work.inc.tera", mode = "template", permissions = "0600" }
+"~/.ssh/config" = { source = ".ssh/config.tera", mode = "template", permissions = "0600" }
+"~/.ssh/development.pub" = { source = ".ssh/development.pub.tera", mode = "template" }
+"~/.ssh/work.pub" = { source = ".ssh/work.pub.tera", mode = "template" }
 "~/.config/1Password/ssh/agent.toml" = { mode = "copy", permissions = "0600" }
 "~/.config/vscode/profiles" = { mode = "copy" }
 
@@ -207,11 +206,14 @@ exclude = ["dot-config/claude/settings.json", "dot-config/codex/config.toml"]
 "~/.config/1Password" = { permissions = "0700" }
 "~/.config/1Password/ssh" = { permissions = "0700" }
 "~/.config/claude/settings.json" = { permissions = "0600" }
-"~/.config/claude/settings.json/managed" = { source = "home/dot-config/claude/settings.json", merge = true }
+"~/.config/claude/settings.json/managed" = { source = "home/.config/claude/settings.json", merge = true }
 "~/.config/codex/config.toml" = { permissions = "0600" }
-"~/.config/codex/config.toml/managed" = { source = "home/dot-config/codex/config.toml", merge = true }
+"~/.config/codex/config.toml/managed" = { source = "home/.config/codex/config.toml", merge = true }
 "~/.config/ghostty/shaders/crt.glsl" = { mode = "absent" }
 "~/.config/ghostty/shaders/bloom.glsl" = { mode = "absent" }
 "~/.config/fish/conf.d/mise.fish" = { mode = "absent" }
 "~/.config/homebrew/Brewfile" = { mode = "absent" }
 "~/.gitconfig" = { mode = "absent" }
+
+[settings.self_update]
+auto = true
