@@ -1,0 +1,2 @@
+{{ exec(command='op read "op://Development/Development SSH/email"') }} {{ exec(command='op read "op://Development/Development SSH/public key"') }}
+{{ exec(command='op read "op://Work/Work SSH/email"') }} {{ exec(command='op read "op://Work/Work SSH/public key"') }}

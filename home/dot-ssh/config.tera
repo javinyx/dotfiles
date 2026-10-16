@@ -1,0 +1,13 @@
+Host github.com
+    User git
+    IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+    IdentityFile ~/.ssh/development.pub
+    IdentitiesOnly yes
+
+{% set work_hostname = exec(command='op read "op://Work/Work SSH/hostname"') -%}
+Host {{ work_hostname }}
+    HostName {{ work_hostname }}
+    User git
+    IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+    IdentityFile ~/.ssh/work.pub
+    IdentitiesOnly yes

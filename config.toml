@@ -1,0 +1,217 @@
+min_version = "2026.10.10"
+
+[tools]
+node = "24"
+java = "temurin-25"
+python = "3"
+
+[bootstrap.packages]
+"brew:fd" = "latest"
+"brew:fish" = "latest"
+"brew:gh" = "latest"
+"brew:jq" = "latest"
+"brew:mole" = "latest"
+"brew:ripgrep" = "latest"
+"brew:rtk" = "latest"
+"brew-cask:1password" = "latest"
+"brew-cask:1password-cli" = "latest"
+"brew-cask:chatgpt" = "latest"
+"brew-cask:claude" = "latest"
+"brew-cask:claude-code@latest" = "latest"
+"brew-cask:codex" = "latest"
+"brew-cask:font-departure-mono-nerd-font" = "latest"
+"brew-cask:font-monocraft-nerd-font" = "latest"
+"brew-cask:font-recursive-mono-nerd-font" = "latest"
+"brew-cask:ghostty" = "latest"
+"brew-cask:hoppscotch" = "latest"
+"brew-cask:kiro-cli" = "latest"
+"brew-cask:microsoft-outlook" = "latest"
+"brew-cask:microsoft-teams" = "latest"
+"brew-cask:mongodb-compass" = "latest"
+"brew-cask:obsidian" = "latest"
+"brew-cask:openusage" = "latest"
+"brew-cask:orbstack" = "latest"
+"brew-cask:spotify" = "latest"
+"brew-cask:thebrowsercompany-dia" = "latest"
+"brew-cask:visual-studio-code" = "latest"
+"brew-cask:vorssaint" = "latest"
+"brew-cask:zoom" = "latest"
+
+[bootstrap.user]
+login_shell = "/opt/homebrew/bin/fish"
+
+[bootstrap.hooks]
+# mise installs the packages above without Homebrew, but `brew` itself is still
+# wanted for one-off installs. Installing it before the packages step lets its
+# installer lay out /opt/homebrew rather than finding mise's copy there.
+pre-packages = [
+  'test -x /opt/homebrew/bin/brew || NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"',
+  "/opt/homebrew/bin/brew analytics off",
+]
+# Raw defaults are not templated, so the preferences that embed the home
+# directory are written here. Symbolic hotkeys are only re-read at login unless
+# activateSettings reloads them.
+post-defaults = [
+  'mkdir -p "$HOME/Pictures/Screenshots"',
+  'defaults write com.apple.screencapture location -string "$HOME/Pictures/Screenshots"',
+  'defaults write com.apple.finder NewWindowTargetPath -string "file://$HOME/"',
+  "/System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u",
+]
+
+[bootstrap.macos.keyboard]
+key_repeat = 2
+initial_key_repeat = 15
+automatic_spelling_correction = false
+automatic_capitalization = false
+
+[bootstrap.macos.finder]
+show_all_files = true
+show_pathbar = true
+show_status_bar = true
+show_extensions_warning = false
+
+[bootstrap.macos.trackpad]
+tap_to_click = true
+
+[bootstrap.macos.dock]
+autohide = true
+autohide_delay = 0.0
+autohide_time_modifier = 0.2
+show_recents = false
+
+[bootstrap.macos.defaults.NSGlobalDomain]
+NSAutomaticInlinePredictionEnabled = false
+NSAutomaticPeriodSubstitutionEnabled = false
+NSAutomaticQuoteSubstitutionEnabled = false
+NSAutomaticDashSubstitutionEnabled = false
+AppleShowAllExtensions = true
+"com.apple.mouse.tapBehavior" = 1
+
+[bootstrap.macos.defaults."com.apple.TextInputMenu"]
+visible = false
+
+[bootstrap.macos.defaults."com.apple.controlcenter"]
+"NSStatusItem Visible InputMenu" = false
+
+[bootstrap.macos.defaults."com.apple.WindowManager"]
+StandardHideWidgets = 1
+StageManagerHideWidgets = 1
+AllowLocalClientToDropRemoteWidgets = false
+EnableStandardClickToShowDesktop = false
+
+[bootstrap.macos.defaults."com.apple.finder"]
+ShowExternalHardDrivesOnDesktop = true
+ShowHardDrivesOnDesktop = false
+ShowMountedServersOnDesktop = false
+ShowRemovableMediaOnDesktop = false
+NewWindowTarget = "PfHm"
+FXRemoveOldTrashItems = true
+
+[bootstrap.macos.defaults."com.apple.desktopservices"]
+DSDontWriteNetworkStores = true
+DSDontWriteUSBStores = true
+
+# macOS binds the bottom-right corner to Quick Note out of the box. 1 is the
+# value the Hot Corners menu writes for "-".
+[bootstrap.macos.defaults."com.apple.dock"]
+wvous-br-corner = 1
+wvous-br-modifier = 0
+
+# VPN is still a SystemUIServer menu extra rather than a Control Center item, so
+# it is enabled by listing its bundle.
+[bootstrap.macos.defaults."com.apple.systemuiserver"]
+menuExtras = ["/System/Library/CoreServices/Menu Extras/VPN.menu"]
+
+[bootstrap.macos.defaults."com.apple.networkConnect"]
+VPNShowTime = true
+
+# Invert the full-screen and selection screenshot shortcuts: Cmd-Shift copies to
+# the clipboard, while adding Control saves a file to ~/Pictures/Screenshots.
+[[bootstrap.macos.defaults_entries]]
+domain = "com.apple.symbolichotkeys"
+key = "AppleSymbolicHotKeys"
+path = ["28"]
+value = { enabled = true, value = { parameters = [51, 20, 1441792], type = "standard" } }
+
+[[bootstrap.macos.defaults_entries]]
+domain = "com.apple.symbolichotkeys"
+key = "AppleSymbolicHotKeys"
+path = ["29"]
+value = { enabled = true, value = { parameters = [51, 20, 1179648], type = "standard" } }
+
+[[bootstrap.macos.defaults_entries]]
+domain = "com.apple.symbolichotkeys"
+key = "AppleSymbolicHotKeys"
+path = ["30"]
+value = { enabled = true, value = { parameters = [52, 21, 1441792], type = "standard" } }
+
+[[bootstrap.macos.defaults_entries]]
+domain = "com.apple.symbolichotkeys"
+key = "AppleSymbolicHotKeys"
+path = ["31"]
+value = { enabled = true, value = { parameters = [52, 21, 1179648], type = "standard" } }
+
+[[bootstrap.macos.defaults_entries]]
+domain = "NSGlobalDomain"
+key = "com.apple.mouse.tapBehavior"
+host = "current"
+value = 1
+
+[[bootstrap.macos.defaults_entries]]
+domain = "com.apple.Spotlight"
+key = "MenuItemHidden"
+host = "current"
+value = 1
+
+[[bootstrap.macos.defaults_entries]]
+domain = "com.apple.Spotlight"
+key = "PasteboardHistoryEnabled"
+host = "current"
+value = true
+
+[[bootstrap.macos.defaults_entries]]
+domain = "com.apple.controlcenter"
+key = "BatteryShowPercentage"
+host = "current"
+value = true
+
+[tasks.bootstrap]
+description = "Machine setup that the declarative sections cannot express"
+run = [
+  { task = "bootstrap:ghostty-shaders" },
+  { task = "bootstrap:finder-sidebar" },
+  { task = "bootstrap:spotify-autostart" },
+  { task = "bootstrap:power-and-login-window" },
+]
+
+[dotfile_groups.home]
+root = "~/.config/mise/home"
+target = "~"
+mode = "symlink-each"
+dot_prefix = true
+exclude = ["dot-config/claude/settings.json", "dot-config/codex/config.toml"]
+
+[dotfile_groups.home.entries]
+"~/.config/git/allowed_signers" = { source = "dot-config/git/allowed_signers.tera", mode = "template", permissions = "0600" }
+"~/.config/git/personal.inc" = { source = "dot-config/git/personal.inc.tera", mode = "template", permissions = "0600" }
+"~/.config/git/work.inc" = { source = "dot-config/git/work.inc.tera", mode = "template", permissions = "0600" }
+"~/.ssh/config" = { source = "dot-ssh/config.tera", mode = "template", permissions = "0600" }
+"~/.ssh/development.pub" = { source = "dot-ssh/development.pub.tera", mode = "template" }
+"~/.ssh/work.pub" = { source = "dot-ssh/work.pub.tera", mode = "template" }
+"~/.config/1Password/ssh/agent.toml" = { mode = "copy", permissions = "0600" }
+"~/.config/vscode/profiles" = { mode = "copy" }
+
+[dotfiles]
+"~/.ssh" = { permissions = "0700" }
+"~/.ssh/known_hosts/github" = { line = "github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl" }
+"~/.config/1Password" = { permissions = "0700" }
+"~/.config/1Password/ssh" = { permissions = "0700" }
+"~/.config/claude/settings.json" = { permissions = "0600" }
+"~/.config/claude/settings.json/managed" = { source = "home/dot-config/claude/settings.json", merge = true }
+"~/.config/codex/config.toml" = { permissions = "0600" }
+"~/.config/codex/config.toml/managed" = { source = "home/dot-config/codex/config.toml", merge = true }
+"~/.config/ghostty/shaders/crt.glsl" = { mode = "absent" }
+"~/.config/ghostty/shaders/bloom.glsl" = { mode = "absent" }
+"~/.config/fish/conf.d/mise.fish" = { mode = "absent" }
+"~/.config/homebrew/Brewfile" = { mode = "absent" }
+"~/.gitconfig" = { mode = "absent" }

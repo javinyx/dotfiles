@@ -1,4 +1,0 @@
-[tools]
-node = "24"
-java = "temurin-25"
-python = "3"

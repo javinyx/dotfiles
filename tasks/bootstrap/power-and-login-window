@@ -1,0 +1,46 @@
+#!/bin/sh
+#MISE description="Set sleep timings and the lock screen message"
+#MISE hide=true
+#MISE raw=true
+set -eu
+
+battery_display=15
+battery_sleep=30
+ac_display=30
+ac_sleep=60
+login_text="Don't touch my spaghetti"
+
+pmset_value() {
+    pmset -g custom | awk -v section="$1" -v key="$2" '
+        /:$/ { in_section = ($0 == section) }
+        in_section && $1 == key { print $2 }
+    '
+}
+
+power_matches() {
+    [ "$(pmset_value 'Battery Power:' displaysleep)" = "$battery_display" ] &&
+        [ "$(pmset_value 'Battery Power:' sleep)" = "$battery_sleep" ] &&
+        [ "$(pmset_value 'AC Power:' displaysleep)" = "$ac_display" ] &&
+        [ "$(pmset_value 'AC Power:' sleep)" = "$ac_sleep" ]
+}
+
+login_text_matches() {
+    [ "$(defaults read /Library/Preferences/com.apple.loginwindow LoginwindowText 2>/dev/null)" = "$login_text" ]
+}
+
+if power_matches && login_text_matches; then
+    exit 0
+fi
+
+# Ask for the password up front, so a missing or expired credential fails here
+# rather than after half of the settings below have been written.
+sudo -v
+
+if ! power_matches; then
+    sudo pmset -b displaysleep "$battery_display" sleep "$battery_sleep"
+    sudo pmset -c displaysleep "$ac_display" sleep "$ac_sleep"
+fi
+
+if ! login_text_matches; then
+    sudo defaults write /Library/Preferences/com.apple.loginwindow LoginwindowText -string "$login_text"
+fi

@@ -1,0 +1,1 @@
+{{ exec(command='op read "op://Work/Work SSH/public key"') }}

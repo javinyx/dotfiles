@@ -1,0 +1,10 @@
+#!/bin/sh
+#MISE description="Remove every pinned app and folder from the Dock"
+#MISE hide=true
+#MISE confirm="Remove everything pinned in the Dock?"
+set -eu
+
+defaults write com.apple.dock persistent-apps -array
+defaults write com.apple.dock persistent-others -array
+
+killall Dock 2>/dev/null || true

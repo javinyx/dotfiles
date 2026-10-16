@@ -1,0 +1,3 @@
+[user]
+    email = "{{ exec(command='op read "op://Work/Work SSH/email"') }}"
+    signingKey = "{{ exec(command='op read "op://Work/Work SSH/public key"') }}"

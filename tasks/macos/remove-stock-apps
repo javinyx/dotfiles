@@ -1,0 +1,21 @@
+#!/bin/sh
+#MISE description="Delete Keynote, Numbers, Pages, iMovie and GarageBand"
+#MISE hide=true
+#MISE raw=true
+#MISE confirm="Delete Apple's iWork and media apps?"
+set -eu
+
+sudo -v
+for app in Keynote Numbers Pages iMovie GarageBand; do
+    path="/Applications/$app.app"
+    if [ -d "$path" ]; then
+        sudo rm -rf -- "$path"
+    fi
+done
+
+if [ -d "/Library/Application Support/GarageBand" ]; then
+    sudo rm -rf -- "/Library/Application Support/GarageBand"
+fi
+
+defaults write com.apple.dock ResetLaunchPad -bool true
+killall Dock 2>/dev/null || true

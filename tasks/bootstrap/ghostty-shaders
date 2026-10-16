@@ -1,0 +1,34 @@
+#!/bin/sh
+#MISE description="Download the pinned upstream Ghostty shaders"
+#MISE hide=true
+set -eu
+
+shaders="$HOME/.config/ghostty/shaders"
+
+# Each URL is pinned to a commit and checksummed, so a shader is downloaded once
+# and a corrupted or substituted download fails loudly instead of leaving a
+# shader that Ghostty silently refuses to compile.
+fetch() {
+    target="$shaders/$1"
+    if [ -f "$target" ] && echo "$3  $target" | shasum -a 256 -c -s; then
+        return
+    fi
+    download="$(mktemp)"
+    curl -fsSL "$2" -o "$download"
+    if ! echo "$3  $download" | shasum -a 256 -c -s; then
+        rm -f "$download"
+        echo "checksum mismatch for $2" >&2
+        exit 1
+    fi
+    mkdir -p "$shaders"
+    mv "$download" "$target"
+    chmod 644 "$target"
+}
+
+fetch cursor_blaze.glsl \
+    https://raw.githubusercontent.com/0xhckr/ghostty-shaders/85898f08fcf4a9274e418912098e99e00a5f8350/cursor_blaze.glsl \
+    81b8a20bba407ae2eaf48566158c07b41e0fc617fdf84c5f286cd8dc247e543c
+
+fetch dot-matrix.glsl \
+    https://raw.githubusercontent.com/luiscarlospando/crt-shader-with-chromatic-aberration-glow-scanlines-dot-matrix/0013c052a139dade5d1b92245f5493a566ef486d/crt-shader-with-chromatic-aberration-glow-scanlines-dot-matrix.glsl \
+    67e8849c5a1c9c37f14331c53e64be84497668de0b52dd5d46dc77077e84991e
