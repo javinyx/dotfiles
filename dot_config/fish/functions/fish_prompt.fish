@@ -11,24 +11,28 @@ function fish_prompt
         set display_path (prompt_pwd)
     end
 
-    set_color cyan
-    printf '%s' "$display_path"
+    set_color --bold 87b98d
+    printf '  %s' "$display_path"
 
     set -l branch (command git branch --show-current 2>/dev/null)
     if test -n "$branch"
-        set_color brblack
-        printf ' %s' "$branch"
+        set_color 7ca6c9
+        printf '   %s' "$branch"
+
+        if test -n "$(command git status --porcelain 2>/dev/null)"
+            set_color e06c75
+            printf ' •'
+        end
     end
 
-    # A play button when the last command succeeded; the actual exit code when it
-    # did not. The old prompt signalled failure with colour alone, which meant
-    # re-running $status by hand to find out what had happened.
+    printf '\n'
+
     if test $last_status -eq 0
-        set_color green
-        printf ' ▶ '
+        set_color --bold 87b98d
+        printf '❯ '
     else
-        set_color red
-        printf ' ✖ %d ' $last_status
+        set_color --bold e06c75
+        printf '× %d ❯ ' $last_status
     end
 
     set_color normal

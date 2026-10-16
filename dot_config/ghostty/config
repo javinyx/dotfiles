@@ -1,35 +1,20 @@
-font-family = Monocraft
-font-size = 15
+font-family = RecMonoCasual Nerd Font Mono
+font-size = 15.5
+font-feature = calt
+font-feature = liga
 
-# Bespoke themes live in ~/.config/ghostty/themes and take precedence over the
-# ones shipped inside Ghostty.app. Swap to game-boy for the four-shade DMG look.
-theme = arcade-cabinet
-# theme = game-boy
-background-opacity = 0.98
+theme = field-journal
+background-opacity = 1
 
-window-padding-x = 12
-window-padding-y = 12
+window-padding-x = 16
+window-padding-y = 16
 window-padding-balance = true
 macos-titlebar-style = transparent
 
-# Close without the "a process is still running" prompt.
 confirm-close-surface = false
 
-cursor-style = block
+cursor-style = bar
 cursor-style-blink = false
 
-# Shaders run in the order listed, each receiving the previous one's output.
-# starfield must precede arcade-crt: it decides where to draw by comparing each
-# pixel to the background colour, which the CRT pass alters. The two cursor
-# effects sit before the CRT so their trails get scanlined along with the rest.
-custom-shader = shaders/starfield.glsl
-custom-shader = shaders/cursor_blaze.glsl
-custom-shader = shaders/coin-flash.glsl
-custom-shader = shaders/arcade-crt.glsl
-
-# Four passes is the busiest this gets. If it is too much, cursor_blaze and
-# coin-flash are both cursor effects and either can go.
-#   shaders/dot-matrix.glsl  heavier upstream CRT: aberration, glow, dot mask
-#   shaders/gameboy.glsl     four-shade DMG quantiser, with theme = game-boy
-
-custom-shader-animation = true
+custom-shader = shaders/paper.glsl
+custom-shader-animation = false
