@@ -63,7 +63,7 @@ shaders, stay local and untracked.
 | --- | --- | --- |
 | Template | `~/.config/git/{allowed_signers,personal.inc,work.inc}`, `~/.ssh/{config,*.pub}` | Contents come from 1Password. Rendered from `*.tera`. |
 | Copy | `~/.config/vscode/profiles`, `~/.config/1Password/ssh/agent.toml` | VS Code replaces the file on export, which would break a link; 1Password's agent config stays a private regular file. |
-| Merge | `~/.config/claude/settings.json`, `~/.config/codex/config.toml` | The applications rewrite these files; see [Codex and Claude Code](#codex-and-claude-code). |
+| Merge | `~/.config/claude/settings.json`, `~/.config/codex/config.toml`, `~/.config/gh/config.yml` | The applications rewrite these files; see [Codex and Claude Code](#codex-and-claude-code) and [Git](#git). |
 
 Files that should no longer exist anywhere are declared `mode = "absent"`, and
 are removed on the next bootstrap.
@@ -117,6 +117,12 @@ that path automatically; no configuration points at it.
 
 GitHub uses the Development SSH key. The company-hosted Bitbucket instance uses
 the Work SSH key, with its private hostname retrieved from 1Password.
+
+The GitHub CLI's `git_protocol` is set to `ssh`, so `gh repo clone` and `gh pr
+checkout` go through that same key rather than an HTTPS token. `gh` rewrites
+`~/.config/gh/config.yml` whenever a setting or alias changes, so the file is a
+merge entry owning only the keys in `home/.config/gh/config.yml`.
+`~/.config/gh/hosts.yml` holds the auth token and stays local.
 
 `known_hosts` always contains GitHub's pinned key: the bootstrap adds that one
 line when it is missing and leaves every other line alone, since ssh appends to
@@ -290,7 +296,7 @@ without it they fall back to `~/.codex` and `~/.claude`. Claude Code is
 installed from Homebrew's `claude-code@latest` cask.
 
 Both tools rewrite their own configuration at runtime — the selected model and
-effort level, the approval mode, per-project trust levels — so these files are
+effort level, per-project trust levels, plugin state — so these files are
 `merge = true` entries: the bootstrap sets only the keys in
 `home/.config/claude/settings.json` and `home/.config/codex/config.toml`,
 and everything else in the live file stays the application's. Replacing the
@@ -299,8 +305,20 @@ place and JSON keeps its key order, so the tools' own formatting survives and
 `mise dot status` only reports drift in the managed keys. Removing a key from a
 source does not remove it from the live file.
 
-Credentials, sessions, plugins, memories, logs, and caches remain local and are
-intentionally excluded from the repository.
+For Claude Code the managed keys are the auto permission mode, the `rtk hook
+claude` PreToolUse hook, the codex-image plugin with its marketplace, the
+agents-md plugin's instruction-file option, and UI preferences. The model and
+per-model effort level are left to `/model`, so the bootstrap never reverts a
+change made there.
+
+Each tool's global instructions file, `~/.config/claude/CLAUDE.md` and
+`~/.config/codex/AGENTS.md`, only imports an `RTK.md` beside it that explains
+RTK's condensed command output. All four files are linked from `home/`, so
+rerunning `rtk init -g` after an rtk upgrade edits the repository copy of
+Claude's `RTK.md`; review that diff before committing it.
+
+Credentials, sessions, plugin caches, memories, logs, and caches remain local
+and are intentionally excluded from the repository.
 
 ## Agent instructions
 

@@ -201,7 +201,7 @@ run = [
 root = "~/.config/mise/home"
 target = "~"
 mode = "symlink-each"
-exclude = [".config/claude/settings.json", ".config/codex/config.toml"]
+exclude = [".config/claude/settings.json", ".config/codex/config.toml", ".config/gh/config.yml"]
 
 [dotfile_groups.home.entries]
 "~/.config/git/allowed_signers" = { source = ".config/git/allowed_signers.tera", mode = "template", permissions = "0600" }
@@ -222,6 +222,8 @@ exclude = [".config/claude/settings.json", ".config/codex/config.toml"]
 "~/.config/claude/settings.json/managed" = { source = "home/.config/claude/settings.json", merge = true }
 "~/.config/codex/config.toml" = { permissions = "0600" }
 "~/.config/codex/config.toml/managed" = { source = "home/.config/codex/config.toml", merge = true }
+"~/.config/gh/config.yml" = { permissions = "0600" }
+"~/.config/gh/config.yml/managed" = { source = "home/.config/gh/config.yml", merge = true }
 "~/.config/ghostty/shaders/crt.glsl" = { mode = "absent" }
 "~/.config/ghostty/shaders/bloom.glsl" = { mode = "absent" }
 "~/.config/ghostty/shaders/cursor_blaze.glsl" = { mode = "absent" }

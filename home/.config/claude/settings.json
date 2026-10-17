@@ -1,4 +1,41 @@
 {
-  "agentPushNotifEnabled": true,
-  "theme": "dark"
+  "permissions": {
+    "defaultMode": "auto"
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "rtk hook claude"
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "codex-image@codex-image-in-cc": true
+  },
+  "extraKnownMarketplaces": {
+    "codex-image-in-cc": {
+      "source": {
+        "source": "github",
+        "repo": "KingGyuSuh/codex-image-in-cc"
+      }
+    }
+  },
+  "pluginConfigs": {
+    "cc-plugin-agents-md@builtin": {
+      "options": {
+        "instructionFiles": "claude-md-or-agents-md"
+      }
+    }
+  },
+  "feedbackDrafts": "notify",
+  "theme": "dark",
+  "editorMode": "normal",
+  "switchModelsOnFlag": false,
+  "agentPushNotifEnabled": true
 }
