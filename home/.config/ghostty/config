@@ -1,7 +1,7 @@
 font-family = DepartureMono Nerd Font Mono
 font-size = 16.5
 
-theme = light:emerald-dialog,dark:emerald-battle
+theme = light:unova-white,dark:unova-black
 background-opacity = 1
 
 window-padding-x = 18
@@ -12,13 +12,15 @@ macos-titlebar-style = transparent
 macos-icon = custom-style
 macos-icon-frame = plastic
 macos-icon-ghost-color = #f8f8f8
-macos-icon-screen-color = #186840,#50d890
+macos-icon-screen-color = #182028,#40b8f8
 
 confirm-close-surface = false
 
 cursor-style = block
 cursor-style-blink = false
 
-custom-shader = shaders/tall-grass.glsl
+custom-shader = shaders/castelia-skyline.glsl
+custom-shader = shaders/quick-attack.glsl
 custom-shader = shaders/shiny-sparkle.glsl
-custom-shader = shaders/gba-lcd.glsl
+custom-shader = shaders/encounter.glsl
+custom-shader = shaders/ds-lcd.glsl

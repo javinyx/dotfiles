@@ -5,3 +5,4 @@ set -gx EDITOR "code --wait"
 set -gx VISUAL "code --wait"
 set -gx CODEX_HOME "$HOME/.config/codex"
 set -gx CLAUDE_CONFIG_DIR "$HOME/.config/claude"
+set -g fish_greeting

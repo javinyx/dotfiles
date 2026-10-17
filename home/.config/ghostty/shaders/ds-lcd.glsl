@@ -1,8 +1,8 @@
-// GBA LCD
+// DS LCD
 //
-// The Game Boy Advance screen had no backlight and a visible gap between its
-// pixels. This darkens a one-pixel line around every font pixel to bring that
-// grid back.
+// The DS Lite's backlit screen still showed a faint gap between its pixels.
+// This darkens a one-pixel line around every font pixel to bring that grid
+// back, lighter than on an unlit Game Boy Advance.
 //
 // The grid only sits between font pixels because the sizes line up exactly:
 // Departure Mono is drawn on an 11-unit em, so at 16.5pt on a 2x display each
@@ -14,8 +14,7 @@
 
 const float PIXEL  = 3.0;                    // device pixels per font pixel
 const vec2  ORIGIN = vec2(36.0, 36.0);       // 18pt window padding at 2x
-const float GRID   = 0.14;                   // how dark the gaps between pixels are
-const vec3  TINT   = vec3(1.0, 0.985, 0.94); // the unlit screen's warm cast
+const float GRID   = 0.08;                   // how dark the gaps between pixels are
 
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     vec4 src = texture(iChannel0, fragCoord / iResolution.xy);
@@ -24,5 +23,5 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     vec2 withinPixel = mod(floor(fromTopLeft), PIXEL);
     float gap = max(step(PIXEL - 1.0, withinPixel.x), step(PIXEL - 1.0, withinPixel.y));
 
-    fragColor = vec4(src.rgb * TINT * (1.0 - GRID * gap), src.a);
+    fragColor = vec4(src.rgb * (1.0 - GRID * gap), src.a);
 }

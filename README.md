@@ -190,9 +190,9 @@ runtimes. Project-level `mise.toml` files can override these defaults.
 
 ## Ghostty
 
-The terminal is styled after Pokémon Emerald on the Game Boy Advance: a pixel
-font, a palette the GBA could actually display, and a few small effects from
-the game.
+The terminal is styled after Pokémon Black and White on the Nintendo DS: a
+pixel font, a palette in Unova's black, white and battle-menu colours, and
+small animated pixel-art scenes drawn by shaders. The shell itself stays plain.
 
 Departure Mono is drawn on an 11-unit em, so at 16.5pt on a 2x display every
 font pixel is exactly 3x3 device pixels and every cell (21x42) is a whole number
@@ -203,35 +203,43 @@ by an amount a shader cannot see.
 Themes in `~/.config/ghostty/themes` take precedence over the ones shipped
 inside `Ghostty.app`. Ghostty follows the macOS appearance between two:
 
-- **emerald-battle** (dark) is the slate of the battle message box.
-- **emerald-dialog** (light) is the sand of a route path, so the white dialog
-  panel stands out.
+- **unova-black** (dark) is Pokémon Black: blue-black, with Zekrom's electric
+  blue as the cursor.
+- **unova-white** (light) is Pokémon White: cool white, with Reshiram's flame
+  orange as the cursor.
 
-The ANSI colours are Pokémon type colours - Fire red, Grass green, Electric
-yellow, Water blue, Psychic pink, Ice cyan - with the HP-bar mint as bright
-green. Every channel is a multiple of 8, as on the GBA's 15-bit screen, and
-every colour except grey reaches 4.5:1 contrast against its background. Fish
-uses the named ANSI colours rather than hex values, so the shell follows
-whichever theme is active.
+The ANSI colours come from the touch-screen battle menu - FIGHT red, BAG
+yellow, POKéMON green, RUN blue. Every channel is a multiple of 8, as in the
+DS's 15-bit 2D output, and every colour except grey reaches 4.5:1 contrast
+against its background. Fish uses the named ANSI colours rather than hex
+values, so the shell follows whichever theme is active.
 
 Shaders run in the order listed in the config, each receiving the previous
 one's output:
 
-- **tall-grass.glsl** draws swaying Hoenn tall grass in the bottom padding. It
-  only paints pixels that match `iBackgroundColor`, so text is never covered.
+- **castelia-skyline.glsl** draws Castelia City in the bottom padding: towers
+  whose windows light up and go dark, blinking antenna beacons, the Nimbasa
+  Ferris wheel turning, and a train crossing every 40 seconds. It only paints
+  pixels that match `iBackgroundColor`, so text is never covered.
+- **quick-attack.glsl** leaves dithered afterimages behind the cursor when it
+  jumps rather than steps, such as onto a new prompt. Typing never sets it off.
 - **shiny-sparkle.glsl** bursts pixel stars around the cursor when a new prompt
   appears. A prompt is recognised by the cursor changing line and landing two
   cells in, after the prompt's `► `; change `PROMPT_COLUMN` if that changes.
-- **gba-lcd.glsl** darkens the gap between font pixels, like the unlit GBA
-  screen. It runs last so the grass and stars get the grid too. On a 1x display
+- **encounter.glsl** plays the wild-battle transition once when a window, tab or
+  split opens: two flashes, then bars that slide away to reveal the terminal.
+  Set `FLASHES` to 0 to keep the bars without the flash.
+- **ds-lcd.glsl** darkens the gap between font pixels, like the DS Lite's
+  screen. It runs last so everything above gets the grid too. On a 1x display
   the grid cannot align; set `GRID` to 0 there.
 
-Every effect is a named constant at the top of its shader.
+Every effect is a named constant at the top of its shader. The scenes animate
+only while a window is focused, which is Ghostty's default for
+`custom-shader-animation`.
 
-The shell completes the look: `fish_greeting` opens each session with a dialog
-panel, the prompt ends in the game's `►` menu arrow, and the right prompt
-reports results as battle messages ("But it failed!", "Got away safely!"). The
-Dock icon is Ghostty's custom style with an Emerald-green screen.
+The prompt ends in the game's `►` menu arrow, and the right prompt reports
+results as battle messages ("But it failed!", "Got away safely!"). There is no
+greeting. The Dock icon is Ghostty's custom style with a Pokémon Black screen.
 
 Ghostty ignores a shader that fails to compile and reports it only in the log,
 never as a config error, so `ghostty +validate-config` passing says nothing about
@@ -243,11 +251,12 @@ install glslang` and remove it and its `spirv-*` dependencies afterwards:
 ```sh
 { printf '#version 450\n'
   printf 'uniform vec3 iResolution; uniform float iTime, iTimeCursorChange;\n'
-  printf 'uniform vec4 iCurrentCursor, iPreviousCursor;\n'
+  printf 'uniform vec4 iCurrentCursor, iPreviousCursor, iCurrentCursorColor;\n'
   printf 'uniform vec3 iBackgroundColor, iForegroundColor, iCursorColor;\n'
+  printf 'uniform vec3 iPalette[256];\n'
   printf 'uniform sampler2D iChannel0;\n'
   printf 'out vec4 fc;\n'
-  cat shaders/gba-lcd.glsl
+  cat shaders/castelia-skyline.glsl
   printf 'void main(){ mainImage(fc, gl_FragCoord.xy); }\n'
 } > /tmp/t.frag && glslangValidator -S frag /tmp/t.frag
 ```

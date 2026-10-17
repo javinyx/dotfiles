@@ -11,7 +11,7 @@
 //
 // Sprite pixels are two font pixels, snapped to the same grid as the font, so
 // the stars read as part of the screen rather than an overlay. Run this before
-// gba-lcd.glsl so they get the LCD grid too.
+// ds-lcd.glsl so they get the LCD grid too.
 
 const float DURATION      = 0.5;  // seconds, including the stagger
 const float LIFETIME      = 0.32; // seconds each star is visible
