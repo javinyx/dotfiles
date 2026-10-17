@@ -11,16 +11,19 @@ function fish_prompt
         set display_path (prompt_pwd)
     end
 
-    set_color --bold 87b98d
-    printf '  %s' "$display_path"
+    set_color red
+    printf '󰐝  '
+    set_color --bold green
+    printf '%s' "$display_path"
+    set_color normal
 
     set -l branch (command git branch --show-current 2>/dev/null)
     if test -n "$branch"
-        set_color 7ca6c9
+        set_color blue
         printf '   %s' "$branch"
 
         if test -n "$(command git status --porcelain 2>/dev/null)"
-            set_color e06c75
+            set_color yellow
             printf ' •'
         end
     end
@@ -28,12 +31,11 @@ function fish_prompt
     printf '\n'
 
     if test $last_status -eq 0
-        set_color --bold 87b98d
-        printf '❯ '
+        set_color --bold normal
     else
-        set_color --bold e06c75
-        printf '× %d ❯ ' $last_status
+        set_color --bold red
     end
+    printf '► '
 
     set_color normal
 end

@@ -34,8 +34,10 @@ with `--skip dotfiles`, sign in to the 1Password app it installed, and run it
 again.
 
 The bootstrap sets the power and lock screen settings with `sudo` when they
-differ, so run it from a terminal that can prompt for a password. Elsewhere it
-fails with `sudo: a terminal is required`.
+differ, and writes `/etc/pam.d/sudo_local` as root, so run it from a terminal
+that can prompt for a password. Elsewhere it fails with `sudo: a terminal is
+required`. That file enables Touch ID for `sudo`; it is used instead of editing
+`/etc/pam.d/sudo` because macOS updates leave it alone.
 
 ## Daily use
 
@@ -135,8 +137,8 @@ bootstrap. Each step checks before it changes anything:
 | --- | --- |
 | `bootstrap:power-and-login-window` | Sleep timings and the lock screen message. Asks for your password only when one differs. |
 | `bootstrap:finder-sidebar` | Adds Pictures to the Finder sidebar favourites. Additive, so entries added by hand survive. |
+| `bootstrap:default-apps` | Dia for web links and HTML, Obsidian for Markdown, VS Code for code and config files. Sets only what differs. |
 | `bootstrap:spotify-autostart` | Stops Spotify from opening at login, when it is installed. |
-| `bootstrap:ghostty-shaders` | Downloads the upstream shaders; see [Ghostty](#ghostty). |
 
 One-off actions that discard state are never run by the bootstrap. Run them by
 hand on a new Mac, if wanted; each asks for confirmation:
@@ -188,51 +190,55 @@ runtimes. Project-level `mise.toml` files can override these defaults.
 
 ## Ghostty
 
-Monocraft Nerd Font at 15pt, with a bespoke look rather than a stock one.
+The terminal is styled after Pokémon Emerald on the Game Boy Advance: a pixel
+font, a palette the GBA could actually display, and a few small effects from
+the game.
 
-Themes in `~/.config/ghostty/themes` take precedence over the 463 shipped inside
-`Ghostty.app`, so the palette is version-controlled here:
+Departure Mono is drawn on an 11-unit em, so at 16.5pt on a 2x display every
+font pixel is exactly 3x3 device pixels and every cell (21x42) is a whole number
+of them. The shaders depend on that grid, so the font size, the 18pt padding and
+`window-padding-balance = false` move together; balancing would shift the cells
+by an amount a shader cannot see.
 
-- **arcade-cabinet** is the default. Saturated, well-separated hues on a
-  near-black background with a faint violet cast, chosen because a pixel font
-  has no anti-aliasing to soften colour edges. All 16 palette slots are
-  distinct, so syntax highlighting and diffs still carry information - unlike
-  the built-in "Retro", where every slot is the same green.
-- **game-boy** is the authentic four-shade DMG-01 palette. A novelty: with four
-  greens there is no colour information left to highlight with.
+Themes in `~/.config/ghostty/themes` take precedence over the ones shipped
+inside `Ghostty.app`. Ghostty follows the macOS appearance between two:
+
+- **emerald-battle** (dark) is the slate of the battle message box.
+- **emerald-dialog** (light) is the sand of a route path, so the white dialog
+  panel stands out.
+
+The ANSI colours are Pokémon type colours - Fire red, Grass green, Electric
+yellow, Water blue, Psychic pink, Ice cyan - with the HP-bar mint as bright
+green. Every channel is a multiple of 8, as on the GBA's 15-bit screen, and
+every colour except grey reaches 4.5:1 contrast against its background. Fish
+uses the named ANSI colours rather than hex values, so the shell follows
+whichever theme is active.
 
 Shaders run in the order listed in the config, each receiving the previous
-one's output, so order matters:
+one's output:
 
-- **starfield.glsl** drifts parallax stars behind the text. A shader only ever
-  receives the finished image, so there is no "behind" to draw into: it compares
-  each pixel against `iBackgroundColor` and adds stars only where the terminal
-  is showing background, leaving text and selections untouched. It must run
-  before any CRT pass, which would alter those background pixels.
-- **cursor_blaze.glsl** is the upstream cursor trail, placed before the CRT pass
-  so the trail gets scanlined along with everything else.
-- **arcade-crt.glsl** does scanlines, an aperture-grille phosphor mask, a
-  vignette and slight chromatic aberration. Flat by default - barrel distortion
-  is what makes most CRT shaders tiring to work in, since it bends text near the
-  edges - but `CURVATURE` at the top turns it on.
-- **coin-flash.glsl** expands a gold ring on every cursor move, driven by
-  `iTimeCursorChange`. It runs alongside `cursor_blaze`; either can be dropped
-  if four passes is too busy.
-- **dot-matrix.glsl** is a heavier upstream CRT with glow and a dot mask.
-- **gameboy.glsl** quantises the screen to the four DMG greens with a 2x2
-  ordered dither. Pairs with the game-boy theme.
+- **tall-grass.glsl** draws swaying Hoenn tall grass in the bottom padding. It
+  only paints pixels that match `iBackgroundColor`, so text is never covered.
+- **shiny-sparkle.glsl** bursts pixel stars around the cursor when a new prompt
+  appears. A prompt is recognised by the cursor changing line and landing two
+  cells in, after the prompt's `► `; change `PROMPT_COLUMN` if that changes.
+- **gba-lcd.glsl** darkens the gap between font pixels, like the unlit GBA
+  screen. It runs last so the grass and stars get the grid too. On a 1x display
+  the grid cannot align; set `GRID` to 0 there.
 
-Every effect is a named constant at the top of its shader; they are meant to be
-edited. Upstream shaders are downloaded by `bootstrap:ghostty-shaders`, pinned to
-a commit and checksummed, so they are downloaded once rather than on every
-bootstrap and a changed download fails loudly.
+Every effect is a named constant at the top of its shader.
+
+The shell completes the look: `fish_greeting` opens each session with a dialog
+panel, the prompt ends in the game's `►` menu arrow, and the right prompt
+reports results as battle messages ("But it failed!", "Got away safely!"). The
+Dock icon is Ghostty's custom style with an Emerald-green screen.
 
 Ghostty ignores a shader that fails to compile and reports it only in the log,
 never as a config error, so `ghostty +validate-config` passing says nothing about
 whether the shaders work. To check one before committing it, wrap it in the
 Shadertoy preamble Ghostty injects and compile that. This needs `glslang`, which
 is deliberately not in the package list - install it for the occasion with `brew
-install glslang` and remove it afterwards:
+install glslang` and remove it and its `spirv-*` dependencies afterwards:
 
 ```sh
 { printf '#version 450\n'
@@ -241,19 +247,16 @@ install glslang` and remove it afterwards:
   printf 'uniform vec3 iBackgroundColor, iForegroundColor, iCursorColor;\n'
   printf 'uniform sampler2D iChannel0;\n'
   printf 'out vec4 fc;\n'
-  cat shaders/arcade-crt.glsl
+  cat shaders/gba-lcd.glsl
   printf 'void main(){ mainImage(fc, gl_FragCoord.xy); }\n'
 } > /tmp/t.frag && glslangValidator -S frag /tmp/t.frag
 ```
 
-Validate a known-good upstream shader the same way first: if that fails too, the
-preamble is wrong rather than the shader. At runtime, failures appear only here:
+At runtime, failures appear only here:
 
 ```sh
 log show --last 5m --predicate 'process == "ghostty"' --style compact | grep -i shader
 ```
-
-Remove or comment the `custom-shader` lines if they cause rendering problems.
 
 ## VS Code profiles
 
@@ -271,7 +274,10 @@ source copy. Settings Sync is not required for these profiles.
 ## Codex and Claude Code
 
 Codex uses `~/.config/codex` as `CODEX_HOME` and Claude Code uses
-`~/.config/claude` as `CLAUDE_CONFIG_DIR`, both set by Fish. Claude Code is
+`~/.config/claude` as `CLAUDE_CONFIG_DIR`, both set by Fish. Apps started from
+the Dock or at login, such as CodexBar, never start a shell, so the
+`agent-config-env` LaunchAgent also sets both with `launchctl setenv` at login;
+without it they fall back to `~/.codex` and `~/.claude`. Claude Code is
 installed from Homebrew's `claude-code@latest` cask.
 
 Both tools rewrite their own configuration at runtime — the selected model and

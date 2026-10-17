@@ -1,20 +1,24 @@
-font-family = RecMonoCasual Nerd Font Mono
-font-size = 15.5
-font-feature = calt
-font-feature = liga
+font-family = DepartureMono Nerd Font Mono
+font-size = 16.5
 
-theme = field-journal
+theme = light:emerald-dialog,dark:emerald-battle
 background-opacity = 1
 
-window-padding-x = 16
-window-padding-y = 16
-window-padding-balance = true
+window-padding-x = 18
+window-padding-y = 18,30
+window-padding-balance = false
 macos-titlebar-style = transparent
+
+macos-icon = custom-style
+macos-icon-frame = plastic
+macos-icon-ghost-color = #f8f8f8
+macos-icon-screen-color = #186840,#50d890
 
 confirm-close-surface = false
 
-cursor-style = bar
+cursor-style = block
 cursor-style-blink = false
 
-custom-shader = shaders/paper.glsl
-custom-shader-animation = false
+custom-shader = shaders/tall-grass.glsl
+custom-shader = shaders/shiny-sparkle.glsl
+custom-shader = shaders/gba-lcd.glsl

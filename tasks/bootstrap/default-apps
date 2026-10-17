@@ -1,0 +1,120 @@
+#!/bin/sh
+#MISE description="Set the default browser and the apps that open code and notes"
+#MISE hide=true
+set -eu
+
+# Default apps live in com.apple.launchservices.secure.plist, which lsd owns and
+# caches, so writing it with `defaults` is unreliable. The supported route is
+# the LaunchServices API; its handler functions are deprecated in favour of
+# NSWorkspace, which ctypes cannot reach, but still work in macOS 26. Only
+# handlers that differ are set, so the browser confirmation macOS shows on a
+# change appears at most once.
+#
+# LaunchServices only accepts a handler for a type some installed app declares,
+# so extensions VS Code does not declare, such as .env or .fish, cannot be set
+# and are left out. Changes apply asynchronously: reading a handler straight
+# after setting it can still return the old app for a few seconds.
+/usr/bin/python3 - <<'PYTHON'
+import ctypes
+import sys
+
+core_foundation = ctypes.CDLL(
+    "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation"
+)
+core_services = ctypes.CDLL(
+    "/System/Library/Frameworks/CoreServices.framework/CoreServices"
+)
+
+REF = ctypes.c_void_p
+UTF8 = 0x08000100
+ALL_ROLES = 0xFFFFFFFF
+
+BROWSER = "company.thebrowser.dia"
+EDITOR = "com.microsoft.VSCode"
+NOTES = "md.obsidian"
+
+URL_SCHEMES = {"http": BROWSER, "https": BROWSER}
+EXTENSIONS = {
+    "html": BROWSER,
+    "md": NOTES,
+    **{
+        extension: EDITOR
+        for extension in (
+            "txt json yaml yml toml ini xml "
+            "js mjs ts tsx jsx css scss "
+            "py go rs java swift lua"
+        ).split()
+    },
+}
+
+for function, restype, argtypes in (
+    (core_foundation.CFStringCreateWithCString, REF, [REF, ctypes.c_char_p, ctypes.c_uint32]),
+    (core_foundation.CFStringGetCString, ctypes.c_bool, [REF, ctypes.c_char_p, ctypes.c_long, ctypes.c_uint32]),
+    (core_services.UTTypeCreatePreferredIdentifierForTag, REF, [REF, REF, REF]),
+    (core_services.LSCopyApplicationURLsForBundleIdentifier, REF, [REF, REF]),
+    (core_services.LSCopyDefaultHandlerForURLScheme, REF, [REF]),
+    (core_services.LSSetDefaultHandlerForURLScheme, ctypes.c_int32, [REF, REF]),
+    (core_services.LSCopyDefaultRoleHandlerForContentType, REF, [REF, ctypes.c_uint32]),
+    (core_services.LSSetDefaultRoleHandlerForContentType, ctypes.c_int32, [REF, ctypes.c_uint32, REF]),
+):
+    function.restype = restype
+    function.argtypes = argtypes
+
+
+def to_cfstring(value):
+    return core_foundation.CFStringCreateWithCString(None, value.encode(), UTF8)
+
+
+def to_str(cfstring):
+    if not cfstring:
+        return None
+    buffer = ctypes.create_string_buffer(1024)
+    if not core_foundation.CFStringGetCString(cfstring, buffer, 1024, UTF8):
+        return None
+    return buffer.value.decode()
+
+
+def is_installed(bundle_id):
+    return bool(core_services.LSCopyApplicationURLsForBundleIdentifier(to_cfstring(bundle_id), None))
+
+
+def content_type_for(extension):
+    return to_str(core_services.UTTypeCreatePreferredIdentifierForTag(
+        to_cfstring("public.filename-extension"), to_cfstring(extension), None
+    ))
+
+
+def same_app(current, wanted):
+    return current is not None and current.lower() == wanted.lower()
+
+
+failed = False
+
+for scheme, bundle_id in URL_SCHEMES.items():
+    current = to_str(core_services.LSCopyDefaultHandlerForURLScheme(to_cfstring(scheme)))
+    if same_app(current, bundle_id) or not is_installed(bundle_id):
+        continue
+    if core_services.LSSetDefaultHandlerForURLScheme(to_cfstring(scheme), to_cfstring(bundle_id)) != 0:
+        print("could not open {} links with {}".format(scheme, bundle_id), file=sys.stderr)
+        failed = True
+    else:
+        print("{}: -> {}".format(scheme, bundle_id))
+
+content_types = {}
+for extension, bundle_id in EXTENSIONS.items():
+    content_types.setdefault(content_type_for(extension), (extension, bundle_id))
+
+for content_type, (extension, bundle_id) in content_types.items():
+    current = to_str(core_services.LSCopyDefaultRoleHandlerForContentType(to_cfstring(content_type), ALL_ROLES))
+    if same_app(current, bundle_id) or not is_installed(bundle_id):
+        continue
+    if core_services.LSSetDefaultRoleHandlerForContentType(
+        to_cfstring(content_type), ALL_ROLES, to_cfstring(bundle_id)
+    ) != 0:
+        print("could not open .{} files with {}".format(extension, bundle_id), file=sys.stderr)
+        failed = True
+    else:
+        print(".{} -> {}".format(extension, bundle_id))
+
+sys.exit(1 if failed else 0)
+PYTHON

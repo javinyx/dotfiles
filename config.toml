@@ -20,8 +20,6 @@ python = "3"
 "brew-cask:claude-code@latest" = "latest"
 "brew-cask:codex" = "latest"
 "brew-cask:font-departure-mono-nerd-font" = "latest"
-"brew-cask:font-monocraft-nerd-font" = "latest"
-"brew-cask:font-recursive-mono-nerd-font" = "latest"
 "brew-cask:ghostty" = "latest"
 "brew-cask:hoppscotch" = "latest"
 "brew-cask:kiro-cli" = "latest"
@@ -57,6 +55,21 @@ post-defaults = [
   'defaults write com.apple.finder NewWindowTargetPath -string "file://$HOME/"',
   "/System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u",
 ]
+
+# sudo_local survives macOS updates, unlike edits to /etc/pam.d/sudo itself.
+[bootstrap.files."/etc/pam.d/sudo_local"]
+content = "auth       sufficient     pam_tid.so\n"
+owner = "root"
+group = "wheel"
+mode = "0444"
+
+# Fish exports these, but apps launched from the Dock or at login never start a
+# shell, so they would fall back to ~/.claude and ~/.codex. launchctl setenv puts
+# them in the environment launchd gives every app started after login.
+[bootstrap.macos.launchd.agents.agent-config-env]
+program = "/bin/sh"
+args = ["-c", "launchctl setenv CLAUDE_CONFIG_DIR \"$HOME/.config/claude\" && launchctl setenv CODEX_HOME \"$HOME/.config/codex\""]
+run_at_load = true
 
 [bootstrap.macos.keyboard]
 key_repeat = 2
@@ -178,8 +191,8 @@ value = true
 [tasks.bootstrap]
 description = "Machine setup that the declarative sections cannot express"
 run = [
-  { task = "bootstrap:ghostty-shaders" },
   { task = "bootstrap:finder-sidebar" },
+  { task = "bootstrap:default-apps" },
   { task = "bootstrap:spotify-autostart" },
   { task = "bootstrap:power-and-login-window" },
 ]
@@ -211,9 +224,15 @@ exclude = [".config/claude/settings.json", ".config/codex/config.toml"]
 "~/.config/codex/config.toml/managed" = { source = "home/.config/codex/config.toml", merge = true }
 "~/.config/ghostty/shaders/crt.glsl" = { mode = "absent" }
 "~/.config/ghostty/shaders/bloom.glsl" = { mode = "absent" }
+"~/.config/ghostty/shaders/cursor_blaze.glsl" = { mode = "absent" }
+"~/.config/ghostty/shaders/dot-matrix.glsl" = { mode = "absent" }
 "~/.config/fish/conf.d/mise.fish" = { mode = "absent" }
+"~/.config/fish/conf.d/00_fig_pre.fish" = { mode = "absent" }
+"~/.config/fish/conf.d/99_fig_post.fish" = { mode = "absent" }
 "~/.config/homebrew/Brewfile" = { mode = "absent" }
 "~/.gitconfig" = { mode = "absent" }
+"~/.gitignore_global" = { mode = "absent" }
+"~/.hgignore_global" = { mode = "absent" }
 
 [settings.self_update]
 auto = true

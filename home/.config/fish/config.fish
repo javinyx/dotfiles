@@ -1,5 +1,3 @@
-set -g fish_greeting
-
 # Anything that shells out to $EDITOR - gh, mise, brew edit - returns instantly
 # with an empty buffer unless code is told to wait. Git needs no variable here:
 # core.editor is set in the managed git config.
