@@ -1,0 +1,137 @@
+#!/bin/sh
+#MISE description="Lint, validate and secret-scan this repository"
+#MISE hide=true
+#MISE tools={shellcheck="latest", gitleaks="latest", "github:KhronosGroup/glslang"="latest"}
+set -u
+
+# config_root is ~ for the global config, not this checkout, so the repository
+# is found from the script's own path instead.
+repository=$(git -C "$(dirname "$0")" rev-parse --show-toplevel) || exit 1
+cd "$repository" || exit 1
+
+ghostty=/Applications/Ghostty.app/Contents/MacOS/ghostty
+failed=""
+
+step() {
+    name=$1
+    shift
+    printf '==> %s\n' "$name"
+    "$@" || failed="$failed $name"
+}
+
+check_fish() {
+    git ls-files -z '*.fish' | xargs -0 -n 1 fish --no-execute
+}
+
+check_shell() {
+    shellcheck tasks/*/* tasks/check
+}
+
+check_parse() {
+    git ls-files -z '*.toml' '*.json' '*.code-profile' | xargs -0 python3 -c '
+import json, sys, tomllib
+failed = False
+for path in sys.argv[1:]:
+    try:
+        with open(path, "rb") as file:
+            (tomllib.load if path.endswith(".toml") else json.load)(file)
+    except ValueError as error:
+        print("{}: {}".format(path, error), file=sys.stderr)
+        failed = True
+sys.exit(failed)
+' &&
+        git ls-files -z '*.yml' '*.yaml' |
+        xargs -0 /usr/bin/ruby -ryaml -e 'ARGV.each { |path| YAML.safe_load(File.read(path)) }'
+}
+
+check_ghostty() {
+    "$ghostty" +validate-config --config-file=home/.config/ghostty/config
+}
+
+# Ghostty prepends this to every custom shader before compiling it, so a shader
+# is only checked fairly against the same declarations. It mirrors
+# shadertoy_prefix.glsl from Ghostty 1.3; update it when Ghostty adds uniforms.
+shadertoy_prefix() {
+    cat <<'GLSL'
+#version 430 core
+layout(binding = 1, std140) uniform Globals {
+    uniform vec3  iResolution;
+    uniform float iTime;
+    uniform float iTimeDelta;
+    uniform float iFrameRate;
+    uniform int   iFrame;
+    uniform float iChannelTime[4];
+    uniform vec3  iChannelResolution[4];
+    uniform vec4  iMouse;
+    uniform vec4  iDate;
+    uniform float iSampleRate;
+    uniform vec4  iCurrentCursor;
+    uniform vec4  iPreviousCursor;
+    uniform vec4  iCurrentCursorColor;
+    uniform vec4  iPreviousCursorColor;
+    uniform int   iCurrentCursorStyle;
+    uniform int   iPreviousCursorStyle;
+    uniform int   iCursorVisible;
+    uniform float iTimeCursorChange;
+    uniform float iTimeFocus;
+    uniform int   iFocus;
+    uniform vec3  iPalette[256];
+    uniform vec3  iBackgroundColor;
+    uniform vec3  iForegroundColor;
+    uniform vec3  iCursorColor;
+    uniform vec3  iCursorText;
+    uniform vec3  iSelectionForegroundColor;
+    uniform vec3  iSelectionBackgroundColor;
+};
+#define CURSORSTYLE_BLOCK        0
+#define CURSORSTYLE_BLOCK_HOLLOW 1
+#define CURSORSTYLE_BAR          2
+#define CURSORSTYLE_UNDERLINE    3
+#define CURSORSTYLE_LOCK         4
+layout(binding = 0) uniform sampler2D iChannel0;
+layout(location = 0) in vec4 gl_FragCoord;
+layout(location = 0) out vec4 _fragColor;
+#define texture2D texture
+void mainImage(out vec4 fragColor, in vec2 fragCoord);
+void main() { mainImage(_fragColor, gl_FragCoord.xy); }
+GLSL
+}
+
+check_shaders() {
+    work=$(mktemp -d)
+    result=0
+    prefix_lines=$(shadertoy_prefix | wc -l)
+    for shader in home/.config/ghostty/shaders/*.glsl; do
+        { shadertoy_prefix; cat "$shader"; } >"$work/shader.frag"
+        if ! glslangValidator -S frag -G -o "$work/shader.spv" "$work/shader.frag" >"$work/log" 2>&1; then
+            awk -v generated="$work/shader.frag:" -v shader="$shader" -v offset="$prefix_lines" '
+                /^ERROR: / && index($0, generated) {
+                    rest = substr($0, index($0, generated) + length(generated))
+                    line = substr(rest, 1, index(rest, ":") - 1)
+                    print "ERROR: " shader ":" (line - offset) substr(rest, length(line) + 1)
+                }
+            ' "$work/log"
+            result=1
+        fi
+    done
+    rm -rf "$work"
+    return "$result"
+}
+
+check_secrets() {
+    gitleaks git --redact --no-banner --log-level warn . &&
+        gitleaks dir --redact --no-banner --log-level warn .
+}
+
+step fish check_fish
+step shellcheck check_shell
+step parse check_parse
+step ghostty check_ghostty
+step shaders check_shaders
+step secrets check_secrets
+
+if [ -n "$failed" ]; then
+    printf '\nfailed:%s\n' "$failed" >&2
+    exit 1
+fi
+printf '\nall checks passed\n'

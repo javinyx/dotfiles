@@ -45,12 +45,34 @@ required`. That file enables Touch ID for `sudo`; it is used instead of editing
 mise bootstrap --dry-run   # preview every part
 mise bootstrap             # apply every part
 mise dot status            # dotfile drift only
+mise run check             # lint, validate and secret-scan before committing
 git -C ~/Projects/Personal/javinyx/dotfiles pull && mise bootstrap
 ```
 
 Most files in `~` are symlinks into `home/`, so editing them edits the
 repository; commit from the checkout. The exceptions are rendered or copied
 rather than linked, and are listed under [Dotfiles](#dotfiles).
+
+## Checks
+
+`mise run check` runs every check, continues past failures, and lists the ones
+that failed at the end:
+
+| Step | What it checks |
+| --- | --- |
+| `fish` | Every tracked `.fish` file parses (`fish --no-execute`). |
+| `shellcheck` | Every task script. |
+| `parse` | Every tracked TOML, JSON, VS Code profile and YAML file is valid, including the merge sources. |
+| `ghostty` | `ghostty +validate-config` against the repository's config and themes. |
+| `shaders` | Each shader compiles behind Ghostty's Shadertoy prefix, with errors reported at the shader's own line numbers. |
+| `secrets` | `gitleaks` over the git history and the working tree, untracked files included. |
+
+shellcheck, gitleaks and glslang are the task's own `tools`, so mise installs
+them the first time the check runs and puts them on PATH only for it; they are
+not in `[bootstrap.packages]`. Templates are not rendered, so the check never
+calls 1Password. The shader prefix is copied from Ghostty 1.3 into
+`tasks/check`; refresh it when a Ghostty release adds uniforms. Nothing runs it
+automatically.
 
 ## Dotfiles
 
@@ -249,25 +271,9 @@ greeting. The Dock icon is Ghostty's custom style with a Pokémon Black screen.
 
 Ghostty ignores a shader that fails to compile and reports it only in the log,
 never as a config error, so `ghostty +validate-config` passing says nothing about
-whether the shaders work. To check one before committing it, wrap it in the
-Shadertoy preamble Ghostty injects and compile that. This needs `glslang`, which
-is deliberately not in the package list - install it for the occasion with `brew
-install glslang` and remove it and its `spirv-*` dependencies afterwards:
-
-```sh
-{ printf '#version 450\n'
-  printf 'uniform vec3 iResolution; uniform float iTime, iTimeCursorChange;\n'
-  printf 'uniform vec4 iCurrentCursor, iPreviousCursor, iCurrentCursorColor;\n'
-  printf 'uniform vec3 iBackgroundColor, iForegroundColor, iCursorColor;\n'
-  printf 'uniform vec3 iPalette[256];\n'
-  printf 'uniform sampler2D iChannel0;\n'
-  printf 'out vec4 fc;\n'
-  cat shaders/castelia-skyline.glsl
-  printf 'void main(){ mainImage(fc, gl_FragCoord.xy); }\n'
-} > /tmp/t.frag && glslangValidator -S frag /tmp/t.frag
-```
-
-At runtime, failures appear only here:
+whether the shaders work. `mise run check` compiles each one behind the
+Shadertoy prefix Ghostty prepends; see [Checks](#checks). At runtime, failures
+appear only here:
 
 ```sh
 log show --last 5m --predicate 'process == "ghostty"' --style compact | grep -i shader
