@@ -1,0 +1,4 @@
+[bootstrap.packages]
+"brew-cask:microsoft-outlook" = "latest"
+"brew-cask:microsoft-teams" = "latest"
+"brew-cask:zoom" = "latest"

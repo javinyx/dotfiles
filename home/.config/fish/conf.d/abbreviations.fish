@@ -11,4 +11,4 @@ abbr --add --global gd 'git diff'
 abbr --add --global grsu 'git remote set-url origin'
 
 abbr --add --global c code
-abbr --add --global bu 'brew update && brew upgrade'
+abbr --add --global bu 'mise bootstrap packages upgrade && mise upgrade'

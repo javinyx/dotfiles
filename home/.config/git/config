@@ -6,6 +6,16 @@
 
 [core]
     editor = code --wait
+    pager = delta
+    fsmonitor = true
+    untrackedCache = true
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+    navigate = true
+    side-by-side = true
 
 [push]
     autoSetupRemote = true
@@ -18,9 +28,20 @@
 
 [diff]
     algorithm = histogram
+    colorMoved = default
 
 [merge]
     conflictStyle = zdiff3
+
+[rebase]
+    autoSquash = true
+    updateRefs = true
+
+[rerere]
+    enabled = true
+
+[branch]
+    sort = -committerdate
 
 [gpg]
     format = ssh
@@ -31,6 +52,7 @@
 
 [commit]
     gpgSign = true
+    verbose = true
 
 [tag]
     gpgSign = true

@@ -16,6 +16,7 @@ the setup steps nothing declarative covers.
 curl -fsSL https://mise.run | sh
 git clone https://github.com/javinyx/dotfiles.git ~/Projects/Personal/javinyx/dotfiles
 mkdir -p ~/.config && ln -s ~/Projects/Personal/javinyx/dotfiles ~/.config/mise
+echo 'env = ["work"]' > ~/.config/mise/miserc.local.toml   # work Macs only
 ~/.local/bin/mise bootstrap
 ```
 
@@ -137,6 +138,26 @@ identities, so `git log --show-signature` verifies locally instead of reporting
 `~/.config/git/ignore` keeps macOS metadata out of every repository. git reads
 that path automatically; no configuration points at it.
 
+Rebases fold `fixup!` and `squash!` commits in automatically and move any
+branches stacked inside the rebased range along with it. `rerere` records how
+each conflict was resolved and replays that resolution the next time the same
+conflict appears, so check `git diff` after a rebase that reports "Resolved
+using previous resolution". `git branch` lists the most recently committed
+branches first, moved lines are coloured separately from added and removed ones,
+and the commit message editor shows the staged diff below the message.
+
+Diffs are paged through [delta](https://github.com/dandavison/delta) side by
+side, with `n` and `N` jumping between files. `git add -p` uses delta's
+colouring only, since its prompts need the original line layout. delta follows
+the terminal's light or dark background on its own.
+
+The prompt runs `git status` on every render to decide whether to show the
+dirty marker. `core.fsmonitor` and `core.untrackedCache` keep that fast in
+large repositories: git starts a small file-watching daemon per repository the
+first time it needs one and asks it what changed instead of scanning the whole
+tree. The prompt passes `--no-optional-locks` so it never takes the index lock
+while another git command is running.
+
 GitHub uses the Development SSH key. The company-hosted Bitbucket instance uses
 the Work SSH key, with its private hostname retrieved from 1Password.
 
@@ -210,6 +231,23 @@ Homebrew is still installed, by the `pre-packages` hook, so `brew` remains
 available for one-off installs and sees everything mise installed. mise is not
 in the list: it has to exist before the bootstrap can run, and `mise
 self-update` updates the copy the installer put in `~/.local/bin`.
+
+The `bu` abbreviation runs `mise bootstrap packages upgrade && mise upgrade`,
+which upgrades the declared packages and the runtimes below without running the
+rest of the bootstrap. Formulae installed by hand with `brew` are not touched;
+upgrade those with `brew upgrade`.
+
+Apps only a work Mac needs, Outlook, Teams and Zoom, are declared in
+`config.work.toml`, which mise loads on top of `config.toml` only when the
+`work` environment is selected. A machine selects it with an untracked
+`~/.config/mise/miserc.local.toml`:
+
+```toml
+env = ["work"]
+```
+
+Without that file the bootstrap leaves the work apps out. It never uninstalls
+them, so removing the file from a Mac that already has them changes nothing.
 
 The `brew` manager only supports Apple Silicon.
 

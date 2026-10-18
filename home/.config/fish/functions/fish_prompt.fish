@@ -22,7 +22,7 @@ function fish_prompt
         set_color blue
         printf '   %s' "$branch"
 
-        if test -n "$(command git status --porcelain 2>/dev/null)"
+        if test -n "$(command git --no-optional-locks status --porcelain 2>/dev/null)"
             set_color yellow
             printf ' •'
         end
