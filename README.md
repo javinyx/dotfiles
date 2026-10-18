@@ -68,12 +68,17 @@ that failed at the end:
 | `shaders` | Each shader compiles behind Ghostty's Shadertoy prefix, with errors reported at the shader's own line numbers. |
 | `secrets` | `gitleaks` over the git history and the working tree, untracked files included. |
 
-shellcheck, gitleaks and glslang are the task's own `tools`, so mise installs
+Python, shellcheck, gitleaks and glslang are the task's own `tools`, so mise installs
 them the first time the check runs and puts them on PATH only for it; they are
 not in `[bootstrap.packages]`. Templates are not rendered, so the check never
 calls 1Password. The shader prefix is copied from Ghostty 1.3 into
-`tasks/check`; refresh it when a Ghostty release adds uniforms. Nothing runs it
-automatically.
+`tasks/check`; refresh it when a Ghostty release adds uniforms.
+
+Lefthook runs the same task before commits to this repository. The
+`bootstrap:git-hooks` task installs the hook during bootstrap; after cloning,
+run it once with `mise run bootstrap:git-hooks` if you skip the full bootstrap.
+The hook checks the working tree, including unstaged changes; it never fixes or
+stages files.
 
 ## Dotfiles
 
@@ -106,6 +111,8 @@ name order:
   editor-spawned shells get shims. Without it the runtimes below are installed
   but never reach PATH. `[bootstrap.mise_shell_activate]` is not used because it
   writes into `config.fish`, which is a link into this repository.
+- `40-workflow.fish` sets Atuin's configuration directory and loads fzf,
+  zoxide, Worktrunk, and Atuin in interactive shells, when installed.
 
 The login shell is set to Homebrew's fish by `[bootstrap.user]`, which also adds
 it to `/etc/shells`.
@@ -113,6 +120,33 @@ it to `/etc/shells`.
 `$EDITOR` and `$VISUAL` are `code --wait`. Without `--wait`, `code` returns
 before the file is edited and anything that reads the result back sees an empty
 buffer.
+
+Fish abbreviations expand `ls`, `ll`, and `lt` to [eza](https://eza.rocks/):
+`ls` shows icons and lists directories first; `ll` adds hidden files, detailed
+columns, headers, and Git status; `lt` shows a tree two levels deep. Icons use
+the Nerd Font configured in Ghostty. These expand only when typed interactively,
+so scripts and agent commands keep the standard `ls`.
+
+| Tool | Daily use |
+| --- | --- |
+| [fzf](https://github.com/junegunn/fzf) | **Ctrl-T** selects files and **Alt-C** selects directories using fd, including hidden entries and excluding `.git`. |
+| [zoxide](https://github.com/ajeetdsouza/zoxide) | `z project` jumps to a frequently visited directory; `zi project` opens a fuzzy picker. |
+| [Atuin](https://docs.atuin.sh/) | **Ctrl-R** searches history, initially filtered to the current directory. Enter returns a command for editing; Up keeps Fish's usual history navigation. |
+| [Worktrunk](https://worktrunk.dev/) | `wt switch --create feature` creates a branch and worktree and changes into it; `wt list` lists worktrees. |
+| [lazygit](https://github.com/jesseduffield/lazygit) | `lg` opens Git's terminal UI, using delta for diffs and Nerd Font icons. |
+| [ast-grep](https://ast-grep.github.io/) | Structural code search, for example `ast-grep --pattern 'console.log($$$ARGS)' --lang ts src`. |
+| [uv](https://docs.astral.sh/uv/) | `uv run --with requests script.py` runs a script with isolated dependencies; `uvx ruff check .` runs a Python CLI. |
+
+Atuin's config lives at `~/.config/atuin/config.toml`, selected with
+`ATUIN_CONFIG_DIR`. Sync and update checks are disabled; its history and runtime
+data stay local and untracked. Import existing Fish history once with
+`atuin import fish` if wanted. Atuin owns **Ctrl-R**, so fzf's history binding is
+disabled. Atuin's AI binding is also disabled.
+
+lazygit reads its config from `~/Library/Application Support/lazygit/config.yml`
+on macOS. uv reads `~/.config/uv/uv.toml` and uses only existing Python
+installations, so mise remains responsible for installing and selecting Python
+versions.
 
 ## Git
 
@@ -252,7 +286,11 @@ them, so removing the file from a Mac that already has them changes nothing.
 The `brew` manager only supports Apple Silicon.
 
 mise provides the global Node.js 24, Temurin JDK 25, and latest Python 3
-runtimes. Project-level `mise.toml` files can override these defaults.
+runtimes, and the latest Claude Code and Codex. Project-level `mise.toml` files
+can override these defaults. Claude Code and Codex set `auto_update = true`, so
+an interactive prompt upgrades them in the background at most once every
+`tool_update.check_duration` (24 hours). `self_update.auto` does the same for
+mise itself, checking daily before commands that use the network.
 
 ## Ghostty
 
@@ -336,8 +374,8 @@ Codex uses `~/.config/codex` as `CODEX_HOME` and Claude Code uses
 `~/.config/claude` as `CLAUDE_CONFIG_DIR`, both set by Fish. Apps started from
 the Dock or at login, such as CodexBar, never start a shell, so the
 `agent-config-env` LaunchAgent also sets both with `launchctl setenv` at login;
-without it they fall back to `~/.codex` and `~/.claude`. Claude Code is
-installed from Homebrew's `claude-code@latest` cask.
+without it they fall back to `~/.codex` and `~/.claude`. Both are installed by
+mise as global tools; see [Packages](#packages).
 
 Both tools rewrite their own configuration at runtime — the selected model and
 effort level, per-project trust levels, plugin state — so these files are

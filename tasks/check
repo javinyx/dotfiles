@@ -1,7 +1,7 @@
 #!/bin/sh
 #MISE description="Lint, validate and secret-scan this repository"
 #MISE hide=true
-#MISE tools={shellcheck="latest", gitleaks="latest", "github:KhronosGroup/glslang"="latest"}
+#MISE tools={python="3", shellcheck="latest", gitleaks="latest", "github:KhronosGroup/glslang"="latest"}
 set -u
 
 # config_root is ~ for the global config, not this checkout, so the repository
@@ -10,6 +10,7 @@ repository=$(git -C "$(dirname "$0")" rev-parse --show-toplevel) || exit 1
 cd "$repository" || exit 1
 
 ghostty=/Applications/Ghostty.app/Contents/MacOS/ghostty
+python=$(mise which python3) || exit 1
 failed=""
 
 step() {
@@ -28,7 +29,7 @@ check_shell() {
 }
 
 check_parse() {
-    git ls-files -z '*.toml' '*.json' '*.code-profile' | xargs -0 python3 -c '
+    git ls-files -z '*.toml' '*.json' '*.code-profile' | xargs -0 "$python" -c '
 import json, sys, tomllib
 failed = False
 for path in sys.argv[1:]:

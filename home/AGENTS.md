@@ -31,3 +31,15 @@ action that is hard to undo.
 
 Routine judgement calls within an approach already agreed do not need approval.
 Ask once, clearly, rather than narrating alternatives.
+
+## Tools
+
+Use `rg` for text search, `fd` to find files, and `ast-grep` for queries that
+need to match code structure. Use `uv run` for Python scripts with dependencies
+and `uvx` for Python CLIs; Python versions are managed by mise.
+
+Worktrunk (`wt`) is available for managing separate Git worktrees. Run each
+concurrent editing task in its own worktree, with separate dev server ports.
+Use non-interactive commands for automation; fzf, Atuin, and lazygit are for
+interactive use. Follow each repository's documented checks: the global
+`mise run check` task validates the dotfiles repository specifically.

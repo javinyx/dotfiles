@@ -1,0 +1,8 @@
+#!/bin/sh
+#MISE description="Install this repository's Git hooks"
+#MISE hide=true
+set -eu
+
+repository=$(git -C "$(dirname "$0")" rev-parse --show-toplevel)
+cd "$repository"
+lefthook install

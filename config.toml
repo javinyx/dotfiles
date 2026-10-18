@@ -4,22 +4,31 @@ min_version = "2026.10.10"
 node = "24"
 java = "temurin-25"
 python = "3"
+claude = { version = "latest", auto_update = true }
+codex = { version = "latest", auto_update = true }
 
 [bootstrap.packages]
+"brew:ast-grep" = "latest"
+"brew:atuin" = "latest"
+"brew:eza" = "latest"
 "brew:fd" = "latest"
 "brew:fish" = "latest"
+"brew:fzf" = "latest"
 "brew:gh" = "latest"
 "brew:git-delta" = "latest"
 "brew:jq" = "latest"
+"brew:lazygit" = "latest"
+"brew:lefthook" = "latest"
 "brew:mole" = "latest"
 "brew:ripgrep" = "latest"
 "brew:rtk" = "latest"
+"brew:uv" = "latest"
+"brew:worktrunk" = "latest"
+"brew:zoxide" = "latest"
 "brew-cask:1password" = "latest"
 "brew-cask:1password-cli" = "latest"
 "brew-cask:chatgpt" = "latest"
 "brew-cask:claude" = "latest"
-"brew-cask:claude-code@latest" = "latest"
-"brew-cask:codex" = "latest"
 "brew-cask:font-departure-mono-nerd-font" = "latest"
 "brew-cask:ghostty" = "latest"
 "brew-cask:hoppscotch" = "latest"
@@ -30,6 +39,7 @@ python = "3"
 "brew-cask:orbstack" = "latest"
 "brew-cask:spotify" = "latest"
 "brew-cask:thebrowsercompany-dia" = "latest"
+"brew-cask:vicinae" = "latest"
 "brew-cask:visual-studio-code" = "latest"
 "brew-cask:vorssaint" = "latest"
 
@@ -189,6 +199,7 @@ value = true
 [tasks.bootstrap]
 description = "Machine setup that the declarative sections cannot express"
 run = [
+  { task = "bootstrap:git-hooks" },
   { task = "bootstrap:finder-sidebar" },
   { task = "bootstrap:default-apps" },
   { task = "bootstrap:spotify-autostart" },
@@ -236,3 +247,4 @@ exclude = [".config/claude/settings.json", ".config/codex/config.toml", ".config
 
 [settings.self_update]
 auto = true
+check_duration = "1d"
