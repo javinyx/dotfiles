@@ -3,23 +3,30 @@
 // Unova along the bottom edge: two rows of Castelia towers whose windows light
 // up and go dark, antenna beacons, the Nimbasa Ferris wheel turning, and a
 // train crossing every TRAIN_EVERY seconds, the first one half that long after
-// the window opens. A shader only receives the finished terminal image, so
-// each pixel is tested against iBackgroundColor and the scene is drawn only
-// where the terminal shows background: text is never covered.
+// the window opens. Above it, a night sky: stars that thin out towards the
+// middle of the window, a crescent moon, and clouds drifting across. A shader
+// only receives the finished terminal image, so each pixel is tested against
+// iBackgroundColor and the scene is drawn only where the terminal shows
+// background: text is never covered, and the towers rising behind the last
+// lines of text show only between the glyphs.
 //
 // Everything sits on the font-pixel grid, counted from the top-left like
 // ds-lcd.glsl, so the scene shares the LCD grid. Ghostty on macOS already
 // counts fragCoord down from the top, unlike Shadertoy, so it is used as is;
 // flipping it would draw the scene upside down along the top. Rows are counted
-// up from the last whole font pixel at the bottom. The tallest tower plus its
-// antenna is 17 font pixels, which fits inside the 30pt bottom padding (20 font
-// pixels at 2x); anything taller would reach the last line of text.
+// up from the last whole font pixel at the bottom.
 
 const float PIXEL       = 3.0;              // device pixels per font pixel
 const vec2  ORIGIN      = vec2(36.0, 36.0); // 18pt top-left padding at 2x
 const float THRESHOLD   = 0.04;             // how close to the background
 const float WHEEL_AT    = 0.78;             // share of the width
-const float WHEEL_R     = 7.0;              // font pixels
+const float WHEEL_R     = 11.0;             // font pixels
+const float MOON_AT     = 0.86;             // share of the width
+const float MOON_R      = 8.0;              // font pixels
+const float STAR_CELL   = 4.0;              // font pixels, at most one star each
+const float STAR_CHANCE = 0.02;             // share of cells with a star at the top
+const int   CLOUDS      = 7;
+const float CLOUD_W     = 20.0;             // font pixels at the smallest size
 const float WHEEL_TURN  = 120.0;            // seconds per revolution
 const float TRAIN_EVERY = 40.0;             // seconds between trains
 const float TRAIN_SPEED = 110.0;            // font pixels per second
@@ -29,11 +36,19 @@ const float TAU         = 6.28318;
 
 const int NONE = 0, BACK = 1, FRONT = 2, LIT = 3, UNLIT = 4, BEACON = 5;
 const int WHEEL = 6, GONDOLA = 7, TRACK = 8, TRAIN = 9, STRIPE = 10, LAMP = 11;
+const int CLOUD = 12, SHADE = 13, MOON = 14, STAR = 15, RAY = 16;
 
 int gondolaIndex = 0;
+float starGlow = 0.0;
 
 float hash(float n) {
     return fract(sin(n * 127.1) * 43758.5453);
+}
+
+float hash2(vec2 v) {
+    vec3 p3 = fract(v.xyx * 0.1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.x + p3.y) * p3.z);
 }
 
 int tower(vec2 p, float slotWidth, float minH, float maxH, float seed, bool windows) {
@@ -42,6 +57,9 @@ int tower(vec2 p, float slotWidth, float minH, float maxH, float seed, bool wind
     float width = slotWidth - 1.0 - floor(hash(id) * 3.0);
     float x = p.x - slot * slotWidth - floor(hash(id + 1.0) * (slotWidth - width));
     float height = minH + floor(hash(id + 2.0) * (maxH - minH + 1.0));
+    if (hash(id + 6.0) > 0.85) {
+        height += floor((maxH - minH) * 0.6);
+    }
     if (x < 0.0 || x >= width) {
         return NONE;
     }
@@ -93,7 +111,7 @@ int ferrisWheel(vec2 p, vec2 hub) {
         }
     }
 
-    vec2 foot = vec2(4.0, hub.y);
+    vec2 foot = vec2(6.0, hub.y);
     bool onLeg = segmentDistance(p, hub, hub - foot) < 0.55
         || segmentDistance(p, hub, hub + vec2(foot.x, -foot.y)) < 0.55;
     if (abs(r - WHEEL_R) < 0.5 || r < 1.0 || onLeg) {
@@ -137,7 +155,67 @@ int train(vec2 p, float width) {
     return TRAIN;
 }
 
-int scene(vec2 p, float width) {
+bool inPuff(vec2 p, float x, float r) {
+    return length(p + 0.5 - vec2(x, 0.0)) < r;
+}
+
+int cloud(vec2 p, float width, float lastRow) {
+    for (int i = 0; i < CLOUDS; i++) {
+        float seed = float(i) * 7.3 + 101.0;
+        float w = CLOUD_W * (1.0 + floor(hash(seed) * 3.0) * 0.5);
+        float depth = 0.04 + hash(seed + 1.0) * 0.5;
+        float speed = 0.15 + hash(seed + 2.0) * 0.35;
+        float span = width + w + 20.0;
+        float left = floor(mod(hash(seed + 3.0) * span + iTime * speed, span)) - w;
+        vec2 l = p - vec2(left, floor(lastRow * (1.0 - depth)));
+        if (l.x < 0.0 || l.x >= w || l.y < 0.0) {
+            continue;
+        }
+        if (inPuff(l, w * 0.25, w * 0.22) || inPuff(l, w * 0.55, w * 0.32) || inPuff(l, w * 0.8, w * 0.18)) {
+            return l.y < 1.0 ? SHADE : CLOUD;
+        }
+    }
+    return NONE;
+}
+
+int moon(vec2 p, float width, float lastRow) {
+    vec2 centre = vec2(floor(width * MOON_AT), lastRow - MOON_R - 4.0);
+    bool lit = length(p + 0.5 - centre) < MOON_R;
+    bool shadow = length(p + 0.5 - centre - vec2(3.0, 2.0)) < MOON_R;
+    return lit && !shadow ? MOON : NONE;
+}
+
+int star(vec2 p, float lastRow) {
+    vec2 cell = floor(p / STAR_CELL);
+    float depth = (lastRow - (cell.y + 0.5) * STAR_CELL) / lastRow;
+    if (hash2(cell) > STAR_CHANCE * (1.0 - smoothstep(0.05, 0.8, depth))) {
+        return NONE;
+    }
+
+    vec2 at = cell * STAR_CELL + 1.0 + floor(vec2(hash2(cell + 17.0), hash2(cell + 31.0)) * 2.0);
+    vec2 d = abs(p - at);
+    float rate = 0.6 + hash2(cell + 5.0) * 1.8;
+    starGlow = 0.5 + 0.5 * sin(iTime * rate + hash2(cell + 9.0) * TAU);
+    if (d.x + d.y == 0.0) {
+        return STAR;
+    }
+    bool big = hash2(cell + 23.0) > 0.85;
+    return big && d.x + d.y == 1.0 && starGlow > 0.7 ? RAY : NONE;
+}
+
+int sky(vec2 p, float width, float lastRow) {
+    int c = cloud(p, width, lastRow);
+    if (c != NONE) {
+        return c;
+    }
+    int m = moon(p, width, lastRow);
+    if (m != NONE) {
+        return m;
+    }
+    return star(p, lastRow);
+}
+
+int scene(vec2 p, float width, float lastRow) {
     if (p.y < 0.0) {
         return NONE;
     }
@@ -155,15 +233,17 @@ int scene(vec2 p, float width) {
     if (w != NONE) {
         return w;
     }
-    if (abs(p.x - hub.x) <= WHEEL_R + 2.0) {
-        return NONE;
+    if (abs(p.x - hub.x) > WHEEL_R + 2.0) {
+        int front = tower(p, 13.0, 6.0, 26.0, 50.0, true);
+        if (front != NONE) {
+            return front;
+        }
+        int back = tower(p + vec2(5.0, 0.0), 9.0, 12.0, 40.0, 0.0, false);
+        if (back != NONE) {
+            return back;
+        }
     }
-
-    int front = tower(p, 13.0, 3.0, 12.0, 50.0, true);
-    if (front != NONE) {
-        return front;
-    }
-    return tower(p + vec2(5.0, 0.0), 9.0, 6.0, 14.0, 0.0, false);
+    return sky(p, width, lastRow);
 }
 
 vec3 paint(int kind, vec3 bg, vec3 fg, bool light) {
@@ -178,6 +258,11 @@ vec3 paint(int kind, vec3 bg, vec3 fg, bool light) {
     if (kind == TRACK)   return mix(bg, fg, 0.18);
     if (kind == TRAIN)   return mix(bg, fg, 0.45);
     if (kind == STRIPE)  return iCurrentCursorColor.rgb;
+    if (kind == CLOUD)   return mix(bg, fg, light ? 0.07 : 0.09);
+    if (kind == SHADE)   return mix(bg, fg, light ? 0.11 : 0.05);
+    if (kind == MOON)    return mix(bg, iPalette[11], light ? 0.3 : 0.45);
+    if (kind == STAR)    return mix(bg, fg, 0.12 + 0.3 * starGlow);
+    if (kind == RAY)     return mix(bg, fg, 0.15 * starGlow);
     return iPalette[11];
 }
 
@@ -192,7 +277,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     vec2 p = vec2(floor(fromTopLeft.x / PIXEL), lastRow - floor(fromTopLeft.y / PIXEL));
     float width = floor((iResolution.x - ORIGIN.x) / PIXEL);
 
-    int kind = scene(p, width);
+    int kind = scene(p, width, lastRow);
     if (kind != NONE) {
         bool light = dot(iBackgroundColor, vec3(0.299, 0.587, 0.114)) > 0.5;
         fragColor.rgb = paint(kind, iBackgroundColor, iForegroundColor, light);
