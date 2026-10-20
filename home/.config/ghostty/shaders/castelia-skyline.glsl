@@ -8,10 +8,12 @@
 // where the terminal shows background: text is never covered.
 //
 // Everything sits on the font-pixel grid, counted from the top-left like
-// ds-lcd.glsl, so the scene shares the LCD grid. Rows are counted up from the
-// last whole font pixel at the bottom. The tallest tower plus its antenna is
-// 17 font pixels, which fits inside the 30pt bottom padding (20 font pixels at
-// 2x); anything taller would reach the last line of text.
+// ds-lcd.glsl, so the scene shares the LCD grid. Ghostty on macOS already
+// counts fragCoord down from the top, unlike Shadertoy, so it is used as is;
+// flipping it would draw the scene upside down along the top. Rows are counted
+// up from the last whole font pixel at the bottom. The tallest tower plus its
+// antenna is 17 font pixels, which fits inside the 30pt bottom padding (20 font
+// pixels at 2x); anything taller would reach the last line of text.
 
 const float PIXEL       = 3.0;              // device pixels per font pixel
 const vec2  ORIGIN      = vec2(36.0, 36.0); // 18pt top-left padding at 2x
@@ -185,7 +187,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
         return;
     }
 
-    vec2 fromTopLeft = vec2(fragCoord.x, iResolution.y - fragCoord.y) - ORIGIN;
+    vec2 fromTopLeft = fragCoord - ORIGIN;
     float lastRow = floor((iResolution.y - ORIGIN.y) / PIXEL) - 1.0;
     vec2 p = vec2(floor(fromTopLeft.x / PIXEL), lastRow - floor(fromTopLeft.y / PIXEL));
     float width = floor((iResolution.x - ORIGIN.x) / PIXEL);

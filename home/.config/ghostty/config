@@ -1,7 +1,7 @@
 font-family = DepartureMono Nerd Font Mono
 font-size = 16.5
 
-theme = light:unova-white,dark:unova-black
+theme = unova-black
 background-opacity = 1
 
 window-padding-x = 18
