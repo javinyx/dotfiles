@@ -62,3 +62,6 @@
 
 [includeIf "gitdir:~/Projects/Personal/"]
     path = ~/.config/git/personal.inc
+
+[includeIf "gitdir:~/Documents/Obsidian/"]
+    path = ~/.config/git/personal.inc
