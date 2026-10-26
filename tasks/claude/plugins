@@ -1,0 +1,29 @@
+#!/bin/sh
+#MISE description="Copy plugins installed with /plugin into the repository's Claude settings"
+set -eu
+
+repository=$(git -C "$(dirname "$0")" rev-parse --show-toplevel)
+source="$repository/home/.config/claude/settings.json"
+live="${CLAUDE_CONFIG_DIR:-$HOME/.config/claude}/settings.json"
+
+[ -f "$live" ] || exit 0
+
+# Only marketplaces an enabled plugin comes from are copied, because the merge
+# never removes keys, so marketplaces dropped from the repository linger live.
+synced=$(jq --slurpfile live "$live" '
+    ($live[0].enabledPlugins // {}) as $plugins
+    | ($plugins | with_entries(select(.value)) | keys | map(split("@")[1])) as $marketplaces
+    | . * {
+        enabledPlugins: $plugins,
+        extraKnownMarketplaces: ($live[0].extraKnownMarketplaces // {} | with_entries(select(.key | IN($marketplaces[])))),
+        pluginConfigs: ($live[0].pluginConfigs // {})
+    }
+' "$source")
+
+if [ "${1:-}" = "--check" ]; then
+    [ "$synced" = "$(jq . "$source")" ] && exit 0
+    echo "$live has plugin settings the repository lacks; run \`mise run claude:plugins\`" >&2
+    exit 1
+fi
+
+printf '%s\n' "$synced" >"$source"

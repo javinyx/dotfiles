@@ -393,6 +393,12 @@ options, the agents-md plugin's instruction-file option, and UI preferences. The
 per-model effort level are left to `/model`, so the bootstrap never reverts a
 change made there.
 
+`/plugin` writes only to the live file, so after installing or configuring a
+plugin run `mise run claude:plugins` to copy the plugin keys back into the
+repository; `mise run check` fails until you do. It copies only the
+marketplaces an enabled plugin comes from, and an uninstalled plugin must be
+removed from the source by hand.
+
 Each tool's global instructions file, `~/.config/claude/CLAUDE.md` and
 `~/.config/codex/AGENTS.md`, only imports an `RTK.md` beside it that explains
 RTK's condensed command output. All four files are linked from `home/`, so

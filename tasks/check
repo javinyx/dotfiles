@@ -28,6 +28,10 @@ check_shell() {
     shellcheck tasks/*/* tasks/check
 }
 
+check_claude_plugins() {
+    tasks/claude/plugins --check
+}
+
 check_parse() {
     git ls-files -z '*.toml' '*.json' '*.code-profile' | xargs -0 "$python" -c '
 import json, sys, tomllib
@@ -130,6 +134,7 @@ step parse check_parse
 step ghostty check_ghostty
 step shaders check_shaders
 step secrets check_secrets
+step claude-plugins check_claude_plugins
 
 if [ -n "$failed" ]; then
     printf '\nfailed:%s\n' "$failed" >&2

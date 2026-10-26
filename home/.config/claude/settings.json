@@ -18,7 +18,12 @@
   "enabledPlugins": {
     "mattpocock-skills@claude-plugins-official": true,
     "ponytail@ponytail": true,
-    "codex@openai-codex": true
+    "codex@openai-codex": true,
+    "superpowers@claude-plugins-official": true,
+    "impeccable@impeccable": true,
+    "taste-skill@taste-skill": true,
+    "context7@claude-plugins-official": true,
+    "agent-skills@addy-agent-skills": true
   },
   "extraKnownMarketplaces": {
     "ponytail": {
@@ -31,6 +36,24 @@
       "source": {
         "source": "github",
         "repo": "openai/codex-plugin-cc"
+      }
+    },
+    "impeccable": {
+      "source": {
+        "source": "github",
+        "repo": "pbakaus/impeccable"
+      }
+    },
+    "taste-skill": {
+      "source": {
+        "source": "github",
+        "repo": "leonxlnx/taste-skill"
+      }
+    },
+    "addy-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "addyosmani/agent-skills"
       }
     }
   },
