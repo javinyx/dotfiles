@@ -16,13 +16,21 @@
     ]
   },
   "enabledPlugins": {
-    "codex-image@codex-image-in-cc": true
+    "mattpocock-skills@claude-plugins-official": true,
+    "ponytail@ponytail": true,
+    "codex@openai-codex": true
   },
   "extraKnownMarketplaces": {
-    "codex-image-in-cc": {
+    "ponytail": {
       "source": {
         "source": "github",
-        "repo": "KingGyuSuh/codex-image-in-cc"
+        "repo": "DietrichGebert/ponytail"
+      }
+    },
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
       }
     }
   },
@@ -30,6 +38,12 @@
     "cc-plugin-agents-md@builtin": {
       "options": {
         "instructionFiles": "claude-md-or-agents-md"
+      }
+    },
+    "ponytail@ponytail": {
+      "options": {
+        "ledger": true,
+        "sendNames": true
       }
     }
   },

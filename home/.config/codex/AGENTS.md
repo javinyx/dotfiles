@@ -1,1 +1,1 @@
-@/Users/javin/.config/codex/RTK.md
+@./RTK.md

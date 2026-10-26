@@ -388,8 +388,8 @@ place and JSON keeps its key order, so the tools' own formatting survives and
 source does not remove it from the live file.
 
 For Claude Code the managed keys are the auto permission mode, the `rtk hook
-claude` PreToolUse hook, the codex-image plugin with its marketplace, the
-agents-md plugin's instruction-file option, and UI preferences. The model and
+claude` PreToolUse hook, the enabled plugins with their marketplaces and
+options, the agents-md plugin's instruction-file option, and UI preferences. The model and
 per-model effort level are left to `/model`, so the bootstrap never reverts a
 change made there.
 
@@ -398,6 +398,11 @@ Each tool's global instructions file, `~/.config/claude/CLAUDE.md` and
 RTK's condensed command output. All four files are linked from `home/`, so
 rerunning `rtk init -g` after an rtk upgrade edits the repository copy of
 Claude's `RTK.md`; review that diff before committing it.
+
+Codex applies RTK through the `rtk hook codex` PreToolUse hook in
+`~/.config/codex/hooks.json`, also linked from `home/`. Codex runs a hook only
+after it has been trusted, so approve it in the Codex TUI after a fresh
+bootstrap or any change to the file; until then Codex commands run unfiltered.
 
 Credentials, sessions, plugin caches, memories, logs, and caches remain local
 and are intentionally excluded from the repository.
