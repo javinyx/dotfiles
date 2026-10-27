@@ -4,6 +4,7 @@ min_version = "2026.10.10"
 node = "24"
 java = "temurin-25"
 python = "3"
+nub = "latest"
 claude = { version = "latest", auto_update = true }
 codex = { version = "latest", auto_update = true }
 
